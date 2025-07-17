@@ -27,5 +27,5 @@ spring.config.activate.on-profile: local, test
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/hhplus?characterEncoding=UTF-8&serverTimezone=UTC
-    username: hhplus-user
-    password: 1234
+    username: application
+    password: application
