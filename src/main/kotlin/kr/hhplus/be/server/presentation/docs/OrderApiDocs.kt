@@ -1,4 +1,4 @@
-package kr.hhplus.be.server
+package kr.hhplus.be.server.presentation.docs
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -6,18 +6,11 @@ import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import kr.hhplus.be.server.common.exception.ErrorResponse
-import kr.hhplus.be.server.dto.request.OrderRequest
-import kr.hhplus.be.server.dto.response.OrderItemResponse
-import kr.hhplus.be.server.dto.response.OrderResponse
-import org.springframework.web.bind.annotation.PostMapping
+import kr.hhplus.be.server.presentation.request.OrderRequest
+import kr.hhplus.be.server.presentation.response.OrderResponse
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 
-@RestController
-@RequestMapping("/api/v1")
-class OrderController {
+interface OrderApiDocs {
 
     @Operation(
         summary = "주문/결제 처리",
@@ -157,15 +150,7 @@ class OrderController {
             )
         ]
     )
-    @PostMapping("/orders")
-    fun order(@RequestBody req: OrderRequest): OrderResponse {
+    fun order(@RequestBody req: OrderRequest
+    ): OrderResponse
 
-        return OrderResponse(
-            UUID.randomUUID().toString(), req.userId, 30000, 10000, 20000,
-            listOf(
-                OrderItemResponse(UUID.randomUUID().toString(), 1001, "컴퓨터", 1, 150000),
-                OrderItemResponse(UUID.randomUUID().toString(), 1002, "키보드", 1, 30000)
-            ),
-        )
-    }
 }

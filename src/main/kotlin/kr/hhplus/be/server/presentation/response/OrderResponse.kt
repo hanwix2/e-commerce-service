@@ -1,4 +1,4 @@
-package kr.hhplus.be.server.dto.response
+package kr.hhplus.be.server.presentation.response
 
 data class OrderResponse(
     val orderId: String,

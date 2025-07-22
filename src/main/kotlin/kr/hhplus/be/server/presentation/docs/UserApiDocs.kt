@@ -1,22 +1,20 @@
-package kr.hhplus.be.server
+package kr.hhplus.be.server.presentation.docs
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import kr.hhplus.be.server.dto.request.ChargePointRequest
-import kr.hhplus.be.server.dto.request.CouponIssueRequest
-import kr.hhplus.be.server.dto.response.PointChargeResponse
-import kr.hhplus.be.server.dto.response.IssuedCouponResponse
-import kr.hhplus.be.server.dto.response.PointResponse
+import kr.hhplus.be.server.presentation.request.ChargePointRequest
+import kr.hhplus.be.server.presentation.request.CouponIssueRequest
+import kr.hhplus.be.server.presentation.response.IssuedCouponResponse
+import kr.hhplus.be.server.presentation.response.PointChargeResponse
+import kr.hhplus.be.server.presentation.response.PointResponse
 import org.springframework.web.ErrorResponse
-import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
 
-@RestController
-@RequestMapping("/api/v1")
-class UserController {
+interface UserApiDocs {
 
     @Operation(
         summary = "유저의 포인트 충전",
@@ -59,10 +57,9 @@ class UserController {
             ),
         ]
     )
-    @PostMapping("/users/{userId}/points")
-    fun chargePoint(@PathVariable userId: Long, @RequestBody req: ChargePointRequest): PointChargeResponse {
-        return PointChargeResponse(userId, req.amount, 50000)
-    }
+    fun chargePoint(
+        userId: Long, req: ChargePointRequest
+    ): PointChargeResponse
 
     @Operation(
         summary = "유저의 포인트 조회",
@@ -102,10 +99,9 @@ class UserController {
             )
         ]
     )
-    @GetMapping("/users/{userId}/points")
-    fun getPoint(@PathVariable userId: Long): PointResponse {
-        return PointResponse(userId, 50000)
-    }
+    fun getPoint(
+        @PathVariable userId: Long
+    ): PointResponse
 
     @Operation(
         summary = "선착순 쿠폰 발급",
@@ -191,8 +187,8 @@ class UserController {
             )
         ]
     )
-    @PostMapping("/users/{userId}/coupons")
-    fun issueCoupon(@PathVariable userId: Long, @RequestBody req: CouponIssueRequest): IssuedCouponResponse {
-        return IssuedCouponResponse(userId, 123, "RATE", 30, LocalDateTime.now())
-    }
+    fun issueCoupon(
+        @PathVariable userId: Long, @RequestBody req: CouponIssueRequest
+    ): IssuedCouponResponse
+
 }

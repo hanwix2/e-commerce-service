@@ -1,17 +1,15 @@
-package kr.hhplus.be.server
+package kr.hhplus.be.server.presentation.docs
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import kr.hhplus.be.server.dto.response.ProductResponse
+import kr.hhplus.be.server.presentation.response.ProductResponse
 import org.springframework.web.ErrorResponse
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PathVariable
 
-@RestController
-@RequestMapping("/api/v1")
-class ProductController {
+interface ProductApiDocs {
 
     @Operation(
         summary = "상품 조회",
@@ -51,10 +49,9 @@ class ProductController {
             )
         ]
     )
-    @GetMapping("/products/{productId}")
-    fun getProduct(@PathVariable productId: Long): ProductResponse {
-        return ProductResponse(productId, "컴퓨터", 1500000, 30)
-    }
+    fun getProduct(
+        @PathVariable productId: Long
+    ): ProductResponse
 
     @Operation(
         summary = "인기 판매 상품 조회",
@@ -83,14 +80,6 @@ class ProductController {
             )
         ]
     )
-    @GetMapping("/products/popular")
-    fun getPopularProducts(): List<ProductResponse> {
-        return listOf(
-            ProductResponse(1001, "컴퓨터", 1500000, 30),
-            ProductResponse(1002, "키보드", 30000, 20),
-            ProductResponse(1003, "마우스", 15000, 50),
-            ProductResponse(1004, "모니터", 250000, 10),
-            ProductResponse(1005, "헤드셋", 50000, 15)
-        )
-    }
+    fun getPopularProducts(): List<ProductResponse>
+
 }
