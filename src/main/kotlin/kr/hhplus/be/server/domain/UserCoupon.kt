@@ -31,6 +31,20 @@ class UserCoupon(
 
     var usedAt: LocalDateTime? = null
 ) {
+    companion object {
+        fun create(
+            coupon: Coupon,
+            userId: Long,
+        ): UserCoupon {
+            return UserCoupon(
+                coupon = coupon,
+                userId = userId,
+                discountType = coupon.discountType,
+                discountAmount = coupon.discountAmount,
+                status = UserCouponStatus.ACTIVE
+            )
+        }
+    }
 
     fun use(paymentId: Long, usedAt: LocalDateTime) {
         this.paymentId = paymentId

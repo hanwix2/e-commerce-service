@@ -24,4 +24,13 @@ class Coupon(
 
     @Version
     var version: Long = 1L
-)
+) {
+
+    fun decreaseIssuedRemain() {
+        if (issuedRemain <= 0) {
+            throw IllegalStateException("No remaining coupons to issue.")
+        }
+        issuedRemain--
+    }
+
+}
