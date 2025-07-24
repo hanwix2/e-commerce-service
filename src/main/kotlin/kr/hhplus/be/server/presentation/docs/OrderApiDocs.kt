@@ -150,7 +150,7 @@ interface OrderApiDocs {
             )
         ]
     )
-    fun order(@RequestBody req: OrderRequest
+    fun order(@RequestBody request: OrderRequest
     ): OrderResponse
 
 }

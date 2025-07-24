@@ -22,4 +22,25 @@ class Product(
     @Version
     @Column(nullable = false)
     var version: Long = 1L
-)
+) {
+    fun isStockSufficient(quantity: Int): Boolean {
+        if (quantity <= 0) {
+            throw IllegalArgumentException("Quantity must be positive")
+        }
+        return stock >= quantity
+    }
+
+    fun isStockInsufficient(quantity: Int): Boolean {
+        return !isStockSufficient(quantity)
+    }
+
+    fun reduceStock(quantity: Int) {
+        if (quantity <= 0) {
+            throw IllegalArgumentException("Quantity must be positive")
+        }
+        if (stock < quantity) {
+            throw IllegalStateException("Insufficient stock")
+        }
+        stock -= quantity
+    }
+}

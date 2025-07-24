@@ -19,7 +19,7 @@ class UserPointHistory(
     @Column(nullable = false)
     val amount: Long,
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     val createdAt: LocalDateTime = LocalDateTime.now()
 ) {
 
@@ -28,6 +28,14 @@ class UserPointHistory(
             return UserPointHistory(
                 userId = userId,
                 type = PointHistoryType.CHARGE,
+                amount = amount
+            )
+        }
+
+        fun createUseHistory(userId: Long, amount: Long): UserPointHistory {
+            return UserPointHistory(
+                userId = userId,
+                type = PointHistoryType.USE,
                 amount = amount
             )
         }
