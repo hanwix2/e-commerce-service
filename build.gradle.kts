@@ -57,6 +57,8 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:mysql")
+	testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
+	testImplementation("io.mockk:mockk:1.14.4")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
 	// Docs
