@@ -20,12 +20,6 @@ class ProductController(
 
     @GetMapping("/popular")
     override fun getPopularProducts(): List<ProductResponse> {
-        return listOf(
-            ProductResponse(1001, "컴퓨터", 1500000, 30),
-            ProductResponse(1002, "키보드", 30000, 20),
-            ProductResponse(1003, "마우스", 15000, 50),
-            ProductResponse(1004, "모니터", 250000, 10),
-            ProductResponse(1005, "헤드셋", 50000, 15)
-        )
+        return productService.getPopularProducts()
     }
 }
