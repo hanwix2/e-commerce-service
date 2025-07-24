@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.presentation
 
+import jakarta.validation.Valid
+import kr.hhplus.be.server.application.UserService
 import kr.hhplus.be.server.presentation.docs.UserApiDocs
 import kr.hhplus.be.server.presentation.request.ChargePointRequest
 import kr.hhplus.be.server.presentation.response.PointChargeResponse
@@ -8,14 +10,16 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/users")
-class UserController : UserApiDocs {
+class UserController(
+    private val userService: UserService
+) : UserApiDocs {
 
     @PostMapping("/{userId}/points")
     override fun chargePoint(
         @PathVariable userId: Long,
-        @RequestBody request: ChargePointRequest
+        @RequestBody @Valid request: ChargePointRequest
     ): PointChargeResponse {
-        return PointChargeResponse(userId, request.amount, 50000)
+        return userService.chargePoint(userId, request.amount)
     }
 
     @GetMapping("/{userId}/points")
