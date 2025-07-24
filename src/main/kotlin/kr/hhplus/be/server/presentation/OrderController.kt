@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/orders")
 class OrderController : OrderApiDocs {
 
-    @PostMapping("/orders")
+    @PostMapping
     override fun order(@RequestBody req: OrderRequest): OrderResponse {
 
         return OrderResponse(

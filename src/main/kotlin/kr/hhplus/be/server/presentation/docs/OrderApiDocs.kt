@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.ExampleObject
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import kr.hhplus.be.server.common.exception.ErrorResponse
+import kr.hhplus.be.server.global.exception.ErrorResponse
 import kr.hhplus.be.server.presentation.request.OrderRequest
 import kr.hhplus.be.server.presentation.response.OrderResponse
 import org.springframework.web.bind.annotation.RequestBody
