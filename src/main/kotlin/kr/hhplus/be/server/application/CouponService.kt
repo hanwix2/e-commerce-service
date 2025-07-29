@@ -5,7 +5,6 @@ import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
 import kr.hhplus.be.server.presentation.request.CouponIssueRequest
 import kr.hhplus.be.server.presentation.response.IssuedCouponResponse
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,8 +16,7 @@ class CouponService(
 ) {
     @Transactional
     fun issueCoupon(request: CouponIssueRequest): IssuedCouponResponse {
-        val user = userRepository.findByIdOrNull(request.userId)
-            ?: throw BusinessException(ResponseStatus.USER_NOT_FOUND)
+        val user = userRepository.findByIdOrThrow(request.userId)
 
         val coupon = getCoupon(request.couponId)
         val userCoupon = userCouponRepository.save(UserCoupon.create(coupon, user.id))
@@ -33,8 +31,7 @@ class CouponService(
     }
 
     private fun getCoupon(couponId: Long): Coupon {
-        val coupon = couponRepository.findByIdOrNull(couponId)
-            ?: throw BusinessException(ResponseStatus.COUPON_NOT_FOUND)
+        val coupon = couponRepository.findByIdOrThrow(couponId)
 
         if (!coupon.issuable)
             throw BusinessException(ResponseStatus.INVALID_COUPON)
