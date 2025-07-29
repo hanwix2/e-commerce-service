@@ -6,6 +6,7 @@ import kr.hhplus.be.server.domain.UserRepository
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
 import kr.hhplus.be.server.presentation.response.PointChargeResponse
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,7 +18,8 @@ class UserService(
 
     @Transactional
     fun chargePoint(userId: Long, amount: Long): PointChargeResponse {
-        val user = userRepository.findById(userId).orElseThrow { BusinessException(ResponseStatus.USER_NOT_FOUND) }
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw BusinessException(ResponseStatus.USER_NOT_FOUND)
 
         user.chargePoint(amount)
         userRepository.save(user)

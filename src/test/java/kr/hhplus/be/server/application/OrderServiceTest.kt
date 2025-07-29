@@ -1,6 +1,8 @@
 package kr.hhplus.be.server.application
 
-import io.mockk.*
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import kr.hhplus.be.server.domain.*
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
@@ -9,8 +11,7 @@ import kr.hhplus.be.server.presentation.request.OrderRequest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
-import java.util.*
+import org.springframework.data.repository.findByIdOrNull
 
 class OrderServiceTest {
 
@@ -88,9 +89,9 @@ class OrderServiceTest {
             paidAmount = totalPrice
         )
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { productRepository.findById(productId1) } returns Optional.of(product1)
-        every { productRepository.findById(productId2) } returns Optional.of(product2)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { productRepository.findByIdOrNull(productId1) } returns product1
+        every { productRepository.findByIdOrNull(productId2) } returns product2
         every { orderRepository.save(any()) } returns order
         every { orderItemRepository.saveAll(any<List<OrderItem>>()) } returns listOf(orderItem1, orderItem2)
         every { paymentRepository.save(any()) } returns payment
@@ -106,15 +107,15 @@ class OrderServiceTest {
         assertEquals(totalPrice, result.paidAmount)
         assertEquals(2, result.items.size)
 
-        verify(exactly = 1) { userRepository.findById(userId) }
-        verify(exactly = 1) { productRepository.findById(productId1) }
-        verify(exactly = 1) { productRepository.findById(productId2) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { productRepository.findByIdOrNull(productId1) }
+        verify(exactly = 1) { productRepository.findByIdOrNull(productId2) }
         verify(exactly = 1) { orderRepository.save(any()) }
         verify(exactly = 1) { orderItemRepository.saveAll(any<List<OrderItem>>()) }
         verify(exactly = 1) { paymentRepository.save(any()) }
         verify(exactly = 1) { userRepository.save(any()) }
         verify(exactly = 1) { userPointHistoryRepository.save(any()) }
-        verify(exactly = 0) { userCouponRepository.findById(any()) }
+        verify(exactly = 0) { userCouponRepository.findByIdOrNull(any()) }
 
         assertEquals(10 - quantity1, product1.stock)
         assertEquals(5 - quantity2, product2.stock)
@@ -172,11 +173,11 @@ class OrderServiceTest {
             paidAmount = paidAmount
         )
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { productRepository.findById(productId) } returns Optional.of(product)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { productRepository.findByIdOrNull(productId) } returns product
         every { orderRepository.save(any()) } returns order
         every { orderItemRepository.saveAll(any<List<OrderItem>>()) } returns listOf(orderItem)
-        every { userCouponRepository.findById(couponId) } returns Optional.of(userCoupon)
+        every { userCouponRepository.findByIdOrNull(couponId) } returns userCoupon
         every { paymentRepository.save(any()) } returns payment
         every { userCouponRepository.save(any()) } returns userCoupon
         every { userRepository.save(any()) } returns user
@@ -190,7 +191,7 @@ class OrderServiceTest {
         assertEquals(discountAmount, result.discountAmount)
         assertEquals(paidAmount, result.paidAmount)
 
-        verify(exactly = 1) { userCouponRepository.findById(couponId) }
+        verify(exactly = 1) { userCouponRepository.findByIdOrNull(couponId) }
         verify(exactly = 1) { userCouponRepository.save(any()) }
 
         assertEquals(UserCouponStatus.USED, userCoupon.status)
@@ -210,15 +211,15 @@ class OrderServiceTest {
             )
         )
 
-        every { userRepository.findById(userId) } returns Optional.empty()
+        every { userRepository.findByIdOrNull(userId) } returns null
 
         val exception = assertThrows(BusinessException::class.java) {
             orderService.order(orderRequest)
         }
 
         assertEquals(ResponseStatus.USER_NOT_FOUND, exception.status)
-        verify(exactly = 1) { userRepository.findById(userId) }
-        verify(exactly = 0) { productRepository.findById(any()) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 0) { productRepository.findByIdOrNull(any()) }
         verify(exactly = 0) { orderRepository.save(any()) }
     }
 
@@ -236,16 +237,16 @@ class OrderServiceTest {
 
         val user = User(id = userId, name = "Test User", point = 50000L)
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { productRepository.findById(productId) } returns Optional.empty()
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { productRepository.findByIdOrNull(productId) } returns null
 
         val exception = assertThrows(BusinessException::class.java) {
             orderService.order(orderRequest)
         }
 
         assertEquals(ResponseStatus.PRODUCT_NOT_FOUND, exception.status)
-        verify(exactly = 1) { userRepository.findById(userId) }
-        verify(exactly = 1) { productRepository.findById(productId) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { productRepository.findByIdOrNull(productId) }
         verify(exactly = 0) { orderRepository.save(any()) }
     }
 
@@ -264,16 +265,16 @@ class OrderServiceTest {
         val user = User(id = userId, name = "Test User", point = 50000L)
         val product = Product(id = productId, name = "Product 1", price = 10000L, stock = 5) // Stock less than quantity
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { productRepository.findById(productId) } returns Optional.of(product)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { productRepository.findByIdOrNull(productId) } returns product
 
         val exception = assertThrows(BusinessException::class.java) {
             orderService.order(orderRequest)
         }
 
         assertEquals(ResponseStatus.PRODUCT_OUT_OF_STOCK, exception.status)
-        verify(exactly = 1) { userRepository.findById(userId) }
-        verify(exactly = 1) { productRepository.findById(productId) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { productRepository.findByIdOrNull(productId) }
         verify(exactly = 0) { orderRepository.save(any()) }
     }
 
@@ -304,8 +305,8 @@ class OrderServiceTest {
             quantity = quantity
         )
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { productRepository.findById(productId) } returns Optional.of(product)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { productRepository.findByIdOrNull(productId) } returns product
         every { orderRepository.save(any()) } returns order
         every { orderItemRepository.saveAll(any<List<OrderItem>>()) } returns listOf(orderItem)
 
@@ -333,11 +334,11 @@ class OrderServiceTest {
         val product = Product(id = productId, name = "Product 1", price = 10000L, stock = 10)
         val order = Order(id = 1L, user = user, totalPrice = 10000L)
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { productRepository.findById(productId) } returns Optional.of(product)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { productRepository.findByIdOrNull(productId) } returns product
         every { orderRepository.save(any()) } returns order
         every { orderItemRepository.saveAll(any<List<OrderItem>>()) } returns listOf(mockk())
-        every { userCouponRepository.findById(couponId) } returns Optional.empty()
+        every { userCouponRepository.findByIdOrNull(couponId) } returns null
 
         val exception = assertThrows(BusinessException::class.java) {
             orderService.order(orderRequest)
@@ -371,11 +372,11 @@ class OrderServiceTest {
             status = UserCouponStatus.USED
         )
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { productRepository.findById(productId) } returns Optional.of(product)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { productRepository.findByIdOrNull(productId) } returns product
         every { orderRepository.save(any()) } returns order
         every { orderItemRepository.saveAll(any<List<OrderItem>>()) } returns listOf(mockk())
-        every { userCouponRepository.findById(couponId) } returns Optional.of(userCoupon)
+        every { userCouponRepository.findByIdOrNull(couponId) } returns userCoupon
 
         val exception = assertThrows(BusinessException::class.java) {
             orderService.order(orderRequest)

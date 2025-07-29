@@ -6,6 +6,7 @@ import kr.hhplus.be.server.global.exception.ResponseStatus
 import kr.hhplus.be.server.presentation.request.OrderRequest
 import kr.hhplus.be.server.presentation.response.OrderItemResponse
 import kr.hhplus.be.server.presentation.response.OrderResponse
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -22,9 +23,8 @@ class OrderService(
 
     @Transactional
     fun order(request: OrderRequest): OrderResponse {
-        // 유저 검증
-        val user = userRepository.findById(request.userId)
-            .orElseThrow { BusinessException(ResponseStatus.USER_NOT_FOUND) }
+        val user = userRepository.findByIdOrNull(request.userId)
+            ?: throw BusinessException(ResponseStatus.USER_NOT_FOUND)
 
         // 주문 정보 검증 및 생성
         val orderProducts = getOrderProducts(request)
@@ -101,8 +101,8 @@ class OrderService(
 
     private fun getUserCoupon(request: OrderRequest): UserCoupon? {
         return request.userCouponId?.let { couponId ->
-            val userCoupon = userCouponRepository.findById(couponId)
-                .orElseThrow { BusinessException(ResponseStatus.COUPON_NOT_FOUND) }
+            val userCoupon = userCouponRepository.findByIdOrNull(couponId)
+                ?: throw BusinessException(ResponseStatus.COUPON_NOT_FOUND)
 
             if (!userCoupon.isAvailable()) {
                 throw BusinessException(ResponseStatus.INVALID_COUPON)
@@ -126,8 +126,8 @@ class OrderService(
 
     private fun getOrderProducts(request: OrderRequest) =
         request.orderItems.map { itemRequest ->
-            val product = productRepository.findById(itemRequest.productId)
-                .orElseThrow { BusinessException(ResponseStatus.PRODUCT_NOT_FOUND) }
+            val product = productRepository.findByIdOrNull(itemRequest.productId)
+                ?: throw BusinessException(ResponseStatus.PRODUCT_NOT_FOUND)
 
             if (product.isStockInsufficient(itemRequest.quantity)) {
                 throw BusinessException(ResponseStatus.PRODUCT_OUT_OF_STOCK)
