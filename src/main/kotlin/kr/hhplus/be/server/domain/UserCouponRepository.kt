@@ -8,4 +8,6 @@ interface UserCouponRepository : JpaRepository<UserCoupon, Long> {
 
     fun findByIdAndUserId(id: Long, userId: Long): UserCoupon?
 
+    fun findByUserId(userId: Long): List<UserCoupon>
+
 }
