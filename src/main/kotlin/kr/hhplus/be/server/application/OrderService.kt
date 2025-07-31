@@ -99,7 +99,7 @@ class OrderService(
 
     private fun getUserCoupon(request: OrderRequest): UserCoupon? {
         return request.userCouponId?.let { couponId ->
-            val userCoupon = userCouponRepository.findByIdOrThrow(couponId)
+            val userCoupon = userCouponRepository.findByIdOrThrow(couponId, request.userId)
 
             if (!userCoupon.isAvailable()) {
                 throw BusinessException(ResponseStatus.INVALID_COUPON)

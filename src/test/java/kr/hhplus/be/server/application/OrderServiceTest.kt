@@ -177,7 +177,7 @@ class OrderServiceTest {
         every { productRepository.findByIdOrNull(productId) } returns product
         every { orderRepository.save(any()) } returns order
         every { orderItemRepository.saveAll(any<List<OrderItem>>()) } returns listOf(orderItem)
-        every { userCouponRepository.findByIdOrNull(couponId) } returns userCoupon
+        every { userCouponRepository.findByIdAndUserId(couponId, userId) } returns userCoupon
         every { paymentRepository.save(any()) } returns payment
         every { userCouponRepository.save(any()) } returns userCoupon
         every { userRepository.save(any()) } returns user
@@ -191,7 +191,7 @@ class OrderServiceTest {
         assertEquals(discountAmount, result.discountAmount)
         assertEquals(paidAmount, result.paidAmount)
 
-        verify(exactly = 1) { userCouponRepository.findByIdOrNull(couponId) }
+        verify(exactly = 1) { userCouponRepository.findByIdAndUserId(any(), any()) }
         verify(exactly = 1) { userCouponRepository.save(any()) }
 
         assertEquals(UserCouponStatus.USED, userCoupon.status)
@@ -338,7 +338,7 @@ class OrderServiceTest {
         every { productRepository.findByIdOrNull(productId) } returns product
         every { orderRepository.save(any()) } returns order
         every { orderItemRepository.saveAll(any<List<OrderItem>>()) } returns listOf(mockk())
-        every { userCouponRepository.findByIdOrNull(couponId) } returns null
+        every { userCouponRepository.findByIdAndUserId(couponId, userId) } returns null
 
         val exception = assertThrows(BusinessException::class.java) {
             orderService.order(orderRequest)
@@ -376,7 +376,7 @@ class OrderServiceTest {
         every { productRepository.findByIdOrNull(productId) } returns product
         every { orderRepository.save(any()) } returns order
         every { orderItemRepository.saveAll(any<List<OrderItem>>()) } returns listOf(mockk())
-        every { userCouponRepository.findByIdOrNull(couponId) } returns userCoupon
+        every { userCouponRepository.findByIdAndUserId(couponId, userId) } returns userCoupon
 
         val exception = assertThrows(BusinessException::class.java) {
             orderService.order(orderRequest)
