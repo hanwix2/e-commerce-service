@@ -11,6 +11,7 @@ import kr.hhplus.be.server.global.exception.ResponseStatus
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
 import java.util.*
 
 class UserServiceTest {
@@ -27,13 +28,13 @@ class UserServiceTest {
         val expectedTotalPoint = initialPoint + chargeAmount
         val user = User(id = userId, name = "Test User", point = initialPoint)
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
+        every { userRepository.findByIdOrNull(userId) } returns user
         every { userRepository.save(any()) } returns user
         every { userPointHistoryRepository.save(any()) } returns mockk()
 
         val result = userService.chargePoint(userId, chargeAmount)
 
-        verify(exactly = 1) { userRepository.findById(userId) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
         verify(exactly = 1) { userRepository.save(user) }
 
         assertEquals(userId, result.userId)
@@ -47,14 +48,14 @@ class UserServiceTest {
         val userId = 2L
         val chargeAmount = 500L
 
-        every { userRepository.findById(userId) } returns Optional.empty()
+        every { userRepository.findByIdOrNull(userId) } returns null
 
         val exception = assertThrows(BusinessException::class.java) {
             userService.chargePoint(userId, chargeAmount)
         }
 
         assertEquals(ResponseStatus.USER_NOT_FOUND, exception.status)
-        verify(exactly = 1) { userRepository.findById(userId) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
         verify(exactly = 0) { userRepository.save(any()) }
         verify(exactly = 0) { userPointHistoryRepository.save(any()) }
     }

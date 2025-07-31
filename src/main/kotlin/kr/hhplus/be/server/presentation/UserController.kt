@@ -17,7 +17,7 @@ class UserController(
     @PostMapping("/{userId}/points")
     override fun chargePoint(
         @PathVariable userId: Long,
-        @RequestBody @Valid request: ChargePointRequest
+        @Valid @RequestBody request: ChargePointRequest
     ): PointChargeResponse {
         return userService.chargePoint(userId, request.amount)
     }

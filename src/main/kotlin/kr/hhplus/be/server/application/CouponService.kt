@@ -16,8 +16,7 @@ class CouponService(
 ) {
     @Transactional
     fun issueCoupon(request: CouponIssueRequest): IssuedCouponResponse {
-        val user = userRepository.findById(request.userId)
-            .orElseThrow { BusinessException(ResponseStatus.USER_NOT_FOUND) }
+        val user = userRepository.findByIdOrThrow(request.userId)
 
         val coupon = getCoupon(request.couponId)
         val userCoupon = userCouponRepository.save(UserCoupon.create(coupon, user.id))
@@ -32,8 +31,7 @@ class CouponService(
     }
 
     private fun getCoupon(couponId: Long): Coupon {
-        val coupon = couponRepository.findById(couponId)
-            .orElseThrow { BusinessException(ResponseStatus.COUPON_NOT_FOUND) }
+        val coupon = couponRepository.findByIdOrThrow(couponId)
 
         if (!coupon.issuable)
             throw BusinessException(ResponseStatus.INVALID_COUPON)

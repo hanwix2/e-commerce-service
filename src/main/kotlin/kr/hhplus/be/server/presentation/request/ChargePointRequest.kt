@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Min
 data class ChargePointRequest(
 
     @Schema(description = "충전할 포인트 값", example = "10000", minimum = "1")
-    @Min(1)
+    @field:Min(1)
     val amount: Long
 
 )

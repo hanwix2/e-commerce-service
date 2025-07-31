@@ -7,6 +7,8 @@ enum class ResponseStatus(
     val code: Int,
     val message: String,
 ) {
+    // Common (0xxx)
+    INVALID_PARAMETER(HttpStatus.BAD_REQUEST, 101, "유효하지 않은 파라미터가 존재합니다."),
 
     // User (1xxx)
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 1001, "사용자를 찾을 수 없습니다."),

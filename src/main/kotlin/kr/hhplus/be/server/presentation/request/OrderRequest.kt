@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.presentation.request
 
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.Valid
 import jakarta.validation.constraints.Min
 
 @Schema(description = "주문 요청")
@@ -12,6 +13,7 @@ data class OrderRequest(
     val userCouponId: Long? = null,
 
     @Schema(description = "주문할 상품 목록")
+    @field:Valid
     val orderItems: List<OrderItemRequest>
 )
 
@@ -21,6 +23,6 @@ data class OrderItemRequest(
     val productId: Long,
 
     @Schema(description = "구매 수량", example = "1")
-    @Min(1)
+    @field:Min(1)
     val quantity: Int
 )

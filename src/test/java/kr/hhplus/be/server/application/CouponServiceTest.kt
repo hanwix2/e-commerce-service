@@ -10,6 +10,7 @@ import kr.hhplus.be.server.presentation.request.CouponIssueRequest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.springframework.data.repository.findByIdOrNull
 import java.util.*
 
 class CouponServiceTest {
@@ -43,15 +44,15 @@ class CouponServiceTest {
         val userCoupon = UserCoupon.create(coupon, userId)
         userCoupon.id = 201L
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { couponRepository.findById(couponId) } returns Optional.of(coupon)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { couponRepository.findByIdOrNull(couponId) } returns coupon
         every { userCouponRepository.save(any()) } returns userCoupon
         every { couponRepository.save(any()) } returns coupon
 
         val result = couponService.issueCoupon(request)
 
-        verify(exactly = 1) { userRepository.findById(userId) }
-        verify(exactly = 1) { couponRepository.findById(couponId) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { couponRepository.findByIdOrNull(couponId) }
         verify(exactly = 1) { userCouponRepository.save(any()) }
         verify(exactly = 1) { couponRepository.save(any()) }
 
@@ -71,15 +72,15 @@ class CouponServiceTest {
 
         val request = CouponIssueRequest(userId = userId, couponId = couponId)
 
-        every { userRepository.findById(userId) } returns Optional.empty()
+        every { userRepository.findByIdOrNull(userId) } returns  null
 
         val exception = assertThrows(BusinessException::class.java) {
             couponService.issueCoupon(request)
         }
 
         assertEquals(ResponseStatus.USER_NOT_FOUND, exception.status)
-        verify(exactly = 1) { userRepository.findById(userId) }
-        verify(exactly = 0) { couponRepository.findById(any()) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 0) { couponRepository.findByIdOrNull(any()) }
         verify(exactly = 0) { userCouponRepository.save(any()) }
         verify(exactly = 0) { couponRepository.save(any()) }
     }
@@ -93,16 +94,16 @@ class CouponServiceTest {
 
         val user = User(id = userId, name = "Test User")
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { couponRepository.findById(couponId) } returns Optional.empty()
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { couponRepository.findByIdOrNull(couponId) } returns null
 
         val exception = assertThrows(BusinessException::class.java) {
             couponService.issueCoupon(request)
         }
 
         assertEquals(ResponseStatus.COUPON_NOT_FOUND, exception.status)
-        verify(exactly = 1) { userRepository.findById(userId) }
-        verify(exactly = 1) { couponRepository.findById(couponId) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { couponRepository.findByIdOrNull(couponId) }
         verify(exactly = 0) { userCouponRepository.save(any()) }
         verify(exactly = 0) { couponRepository.save(any()) }
     }
@@ -126,16 +127,16 @@ class CouponServiceTest {
             issuable = false
         )
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { couponRepository.findById(couponId) } returns Optional.of(coupon)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { couponRepository.findByIdOrNull(couponId) } returns coupon
 
         val exception = assertThrows(BusinessException::class.java) {
             couponService.issueCoupon(request)
         }
 
         assertEquals(ResponseStatus.INVALID_COUPON, exception.status)
-        verify(exactly = 1) { userRepository.findById(userId) }
-        verify(exactly = 1) { couponRepository.findById(couponId) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { couponRepository.findByIdOrNull(couponId) }
         verify(exactly = 0) { userCouponRepository.save(any()) }
         verify(exactly = 0) { couponRepository.save(any()) }
     }
@@ -159,16 +160,16 @@ class CouponServiceTest {
             issuable = true
         )
 
-        every { userRepository.findById(userId) } returns Optional.of(user)
-        every { couponRepository.findById(couponId) } returns Optional.of(coupon)
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { couponRepository.findByIdOrNull(couponId) } returns coupon
 
         val exception = assertThrows(BusinessException::class.java) {
             couponService.issueCoupon(request)
         }
 
         assertEquals(ResponseStatus.COUPON_OUT_OF_STOCK, exception.status)
-        verify(exactly = 1) { userRepository.findById(userId) }
-        verify(exactly = 1) { couponRepository.findById(couponId) }
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { couponRepository.findByIdOrNull(couponId) }
         verify(exactly = 0) { userCouponRepository.save(any()) }
         verify(exactly = 0) { couponRepository.save(any()) }
     }

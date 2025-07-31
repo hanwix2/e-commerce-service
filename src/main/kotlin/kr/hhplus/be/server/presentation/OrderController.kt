@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.presentation
 
+import jakarta.validation.Valid
 import kr.hhplus.be.server.application.OrderService
 import kr.hhplus.be.server.presentation.docs.OrderApiDocs
 import kr.hhplus.be.server.presentation.request.OrderRequest
@@ -16,7 +17,7 @@ class OrderController(
 ) : OrderApiDocs {
 
     @PostMapping
-    override fun order(@RequestBody request: OrderRequest): OrderResponse {
+    override fun order(@Valid @RequestBody request: OrderRequest): OrderResponse {
         return orderService.order(request);
     }
 }

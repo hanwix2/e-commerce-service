@@ -3,8 +3,7 @@ package kr.hhplus.be.server.application
 import kr.hhplus.be.server.domain.OrderItemRepository
 import kr.hhplus.be.server.domain.Product
 import kr.hhplus.be.server.domain.ProductRepository
-import kr.hhplus.be.server.global.exception.BusinessException
-import kr.hhplus.be.server.global.exception.ResponseStatus
+import kr.hhplus.be.server.domain.findByIdOrThrow
 import kr.hhplus.be.server.presentation.response.ProductResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -22,8 +21,7 @@ class ProductService(
 
     @Transactional(readOnly = true)
     fun getProductInfo(productId: Long): ProductResponse {
-        val product = productRepository.findById(productId)
-            .orElseThrow { BusinessException(ResponseStatus.PRODUCT_NOT_FOUND) }
+        val product = productRepository.findByIdOrThrow(productId)
 
         return ProductResponse.from(product)
     }

@@ -1,20 +1,87 @@
 package kr.hhplus.be.server.global.exception
 
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.validation.BindException
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.WebRequest
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
-@ControllerAdvice
-class GlobalExceptionHandler {
+@RestControllerAdvice
+class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     @ExceptionHandler(BusinessException::class)
-    fun handleBusinessException(e: BusinessException): ResponseEntity<ErrorResponse> {
+    fun handleBusinessException(e: BusinessException): ResponseEntity<Any> {
+        return handleExceptionInternal(e)
+    }
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<Any> {
+        return handleExceptionInternal(ResponseStatus.INVALID_PARAMETER, e.message ?: "잘못된 파라미터입니다.")
+    }
+
+    override fun handleMethodArgumentNotValid(
+        ex: MethodArgumentNotValidException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any>? {
+        return handleExceptionInternal(ex, ResponseStatus.INVALID_PARAMETER)
+    }
+
+    private fun handleExceptionInternal(e: BusinessException): ResponseEntity<Any> {
+        return handleExceptionInternal(e.status)
+    }
+
+    private fun handleExceptionInternal(status: ResponseStatus): ResponseEntity<Any> {
+        val errorResponse = makeErrorResponseBody(status)
+        return ResponseEntity(errorResponse, status.httpStatus)
+    }
+
+    private fun handleExceptionInternal(status: ResponseStatus, message: String): ResponseEntity<Any> {
+        val errorResponse = makeErrorResponseBody(status, message)
+        return ResponseEntity(errorResponse, status.httpStatus)
+    }
+
+    private fun handleExceptionInternal(e: BindException, status: ResponseStatus): ResponseEntity<Any> {
+        val errorResponse = makeErrorResponseBody(e, status)
+        return ResponseEntity(errorResponse, status.httpStatus)
+    }
+
+    private fun makeErrorResponseBody(e: BindException, status: ResponseStatus): ErrorResponse {
         val errorResponse = ErrorResponse(
-            code = e.status.code,
-            status = e.status,
-            message = e.status.message
+            code = status.code,
+            status = status,
+            message = status.message,
+            errors = e.bindingResult.fieldErrors.map { fieldError ->
+                ValidationError(
+                    field = fieldError.field,
+                    message = fieldError.defaultMessage ?: "유효하지 않은 값입니다."
+                )
+            }
         )
-        return ResponseEntity(errorResponse, e.status.httpStatus)
+        return errorResponse
+    }
+
+    private fun makeErrorResponseBody(status: ResponseStatus): ErrorResponse {
+        val errorResponse = ErrorResponse(
+            code = status.code,
+            status = status,
+            message = status.message
+        )
+        return errorResponse
+    }
+
+    private fun makeErrorResponseBody(status: ResponseStatus, message: String): ErrorResponse {
+        val errorResponse = ErrorResponse(
+            code = status.code,
+            status = status,
+            message = message
+        )
+        return errorResponse
     }
 
 }
