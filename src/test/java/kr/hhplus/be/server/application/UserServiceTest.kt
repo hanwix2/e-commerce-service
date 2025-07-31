@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
-import java.util.*
 
 class UserServiceTest {
 
@@ -58,6 +57,20 @@ class UserServiceTest {
         verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
         verify(exactly = 0) { userRepository.save(any()) }
         verify(exactly = 0) { userPointHistoryRepository.save(any()) }
+    }
+
+    @Test
+    fun getPointOfUser() {
+        val userId = 3L
+        val expectedPoint = 1500L
+        val user = User(id = userId, name = "TestUser", point = expectedPoint)
+
+        every { userRepository.findByIdOrNull(userId) } returns user
+
+        val result = userService.getPointOfUser(userId)
+
+        assertEquals(userId, result.userId)
+        assertEquals(expectedPoint, result.totalPoint)
     }
 
 }

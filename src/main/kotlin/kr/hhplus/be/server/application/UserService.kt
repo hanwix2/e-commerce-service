@@ -5,6 +5,7 @@ import kr.hhplus.be.server.domain.UserPointHistoryRepository
 import kr.hhplus.be.server.domain.UserRepository
 import kr.hhplus.be.server.domain.findByIdOrThrow
 import kr.hhplus.be.server.presentation.response.PointChargeResponse
+import kr.hhplus.be.server.presentation.response.PointResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -25,5 +26,14 @@ class UserService(
         userPointHistoryRepository.save(pointHistory)
 
         return PointChargeResponse(userId, amount, user.point)
+    }
+
+    fun getPointOfUser(userId: Long): PointResponse {
+        val user = userRepository.findByIdOrThrow(userId)
+
+        return PointResponse(
+            userId = user.id,
+            totalPoint = user.point
+        )
     }
 }

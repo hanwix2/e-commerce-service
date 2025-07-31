@@ -26,7 +26,7 @@ class UserController(
     override fun getPoint(
         @PathVariable userId: Long
     ): PointResponse {
-        return PointResponse(userId, 50000)
+        return userService.getPointOfUser(userId)
     }
 
 }
