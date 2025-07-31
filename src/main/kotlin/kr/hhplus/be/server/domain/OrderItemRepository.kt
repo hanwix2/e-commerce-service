@@ -15,7 +15,7 @@ interface OrderItemRepository : JpaRepository<OrderItem, Long> {
         WHERE oi.createdAt >= :startAt 
         AND oi.status = kr.hhplus.be.server.domain.OrderItemStatus.PURCHASE 
         GROUP BY oi.productId
-        ORDER BY COUNT(oi.productId) DESC
+        ORDER BY SUM(oi.quantity) DESC
         LIMIT :limitNumber
     """
     )
