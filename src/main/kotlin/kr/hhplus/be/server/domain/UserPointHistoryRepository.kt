@@ -4,4 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserPointHistoryRepository : JpaRepository<UserPointHistory, Long>
+interface UserPointHistoryRepository : JpaRepository<UserPointHistory, Long> {
+    fun findByUserId(userId: Long): List<UserPointHistory>
+}

@@ -21,4 +21,6 @@ interface OrderItemRepository : JpaRepository<OrderItem, Long> {
     )
     fun findTopDistinctPurchasedProductIdsByCreatedAtAfter(limitNumber: Int, startAt: LocalDateTime): List<Long>
 
+    fun findByOrder(order: Order): List<OrderItem>
+
 }
