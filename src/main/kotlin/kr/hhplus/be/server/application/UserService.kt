@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.application
 
 import kr.hhplus.be.server.domain.UserPointHistory
-import kr.hhplus.be.server.domain.UserPointHistoryRepository
-import kr.hhplus.be.server.domain.UserRepository
-import kr.hhplus.be.server.domain.findByIdOrThrow
+import kr.hhplus.be.server.infrastructure.UserPointHistoryRepository
+import kr.hhplus.be.server.infrastructure.UserRepository
+import kr.hhplus.be.server.infrastructure.findByIdOrThrow
 import kr.hhplus.be.server.presentation.response.PointChargeResponse
 import kr.hhplus.be.server.presentation.response.PointResponse
 import org.springframework.stereotype.Service

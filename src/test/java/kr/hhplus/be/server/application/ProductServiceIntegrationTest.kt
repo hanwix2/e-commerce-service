@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.application
 
 import kr.hhplus.be.server.domain.OrderItem
-import kr.hhplus.be.server.domain.OrderItemRepository
+import kr.hhplus.be.server.infrastructure.OrderItemRepository
 import kr.hhplus.be.server.domain.Product
-import kr.hhplus.be.server.domain.ProductRepository
+import kr.hhplus.be.server.infrastructure.ProductRepository
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
 import org.junit.jupiter.api.BeforeEach

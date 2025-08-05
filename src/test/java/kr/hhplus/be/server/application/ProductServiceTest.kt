@@ -2,18 +2,16 @@ package kr.hhplus.be.server.application
 
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.verify
-import kr.hhplus.be.server.domain.OrderItemRepository
+import kr.hhplus.be.server.infrastructure.OrderItemRepository
 import kr.hhplus.be.server.domain.Product
-import kr.hhplus.be.server.domain.ProductRepository
+import kr.hhplus.be.server.infrastructure.ProductRepository
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 import java.util.*
 
 class ProductServiceTest {

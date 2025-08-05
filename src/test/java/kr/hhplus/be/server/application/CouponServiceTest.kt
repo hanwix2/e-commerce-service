@@ -6,12 +6,14 @@ import io.mockk.verify
 import kr.hhplus.be.server.domain.*
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
+import kr.hhplus.be.server.infrastructure.CouponRepository
+import kr.hhplus.be.server.infrastructure.UserCouponRepository
+import kr.hhplus.be.server.infrastructure.UserRepository
 import kr.hhplus.be.server.presentation.request.CouponIssueRequest
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.springframework.data.repository.findByIdOrNull
-import java.util.*
 
 class CouponServiceTest {
 

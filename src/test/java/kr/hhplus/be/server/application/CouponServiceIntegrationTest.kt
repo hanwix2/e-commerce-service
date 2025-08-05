@@ -3,6 +3,9 @@ package kr.hhplus.be.server.application
 import kr.hhplus.be.server.domain.*
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
+import kr.hhplus.be.server.infrastructure.CouponRepository
+import kr.hhplus.be.server.infrastructure.UserCouponRepository
+import kr.hhplus.be.server.infrastructure.UserRepository
 import kr.hhplus.be.server.presentation.request.CouponIssueRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*

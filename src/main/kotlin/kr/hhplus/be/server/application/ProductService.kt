@@ -1,9 +1,9 @@
 package kr.hhplus.be.server.application
 
-import kr.hhplus.be.server.domain.OrderItemRepository
+import kr.hhplus.be.server.infrastructure.OrderItemRepository
 import kr.hhplus.be.server.domain.Product
-import kr.hhplus.be.server.domain.ProductRepository
-import kr.hhplus.be.server.domain.findByIdOrThrow
+import kr.hhplus.be.server.infrastructure.ProductRepository
+import kr.hhplus.be.server.infrastructure.findByIdOrThrow
 import kr.hhplus.be.server.presentation.response.ProductResponse
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

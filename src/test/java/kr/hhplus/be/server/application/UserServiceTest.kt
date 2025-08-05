@@ -4,8 +4,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kr.hhplus.be.server.domain.User
-import kr.hhplus.be.server.domain.UserPointHistoryRepository
-import kr.hhplus.be.server.domain.UserRepository
+import kr.hhplus.be.server.infrastructure.UserPointHistoryRepository
+import kr.hhplus.be.server.infrastructure.UserRepository
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
 import org.junit.jupiter.api.Assertions.assertEquals

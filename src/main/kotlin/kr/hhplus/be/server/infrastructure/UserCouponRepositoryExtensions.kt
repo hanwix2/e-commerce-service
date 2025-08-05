@@ -1,5 +1,6 @@
-package kr.hhplus.be.server.domain
+package kr.hhplus.be.server.infrastructure
 
+import kr.hhplus.be.server.domain.UserCoupon
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
 

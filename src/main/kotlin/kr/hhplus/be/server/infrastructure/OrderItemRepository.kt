@@ -1,5 +1,7 @@
-package kr.hhplus.be.server.domain
+package kr.hhplus.be.server.infrastructure
 
+import kr.hhplus.be.server.domain.Order
+import kr.hhplus.be.server.domain.OrderItem
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
