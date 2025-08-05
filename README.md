@@ -21,67 +21,25 @@ docker-compose up -d
 
 ```aiignore
 .
-├── ECommerceServiceApplication.kt
 ├── application
-│   ├── CouponService.kt
-│   ├── OrderService.kt
-│   ├── ProductService.kt
-│   └── UserService.kt
 ├── domain
-│   ├── Coupon.kt
-│   ├── CouponRepository.kt
-│   ├── DiscountType.kt
-│   ├── Order.kt
-│   ├── OrderItem.kt
-│   ├── OrderItemRepository.kt
-│   ├── OrderProduct.kt
-│   ├── OrderRepository.kt
-│   ├── Payment.kt
-│   ├── PaymentRepository.kt
-│   ├── Product.kt
-│   ├── ProductRepository.kt
-│   ├── User.kt
-│   ├── UserCoupon.kt
-│   ├── UserCouponRepository.kt
-│   ├── UserPointHistory.kt
-│   ├── UserPointHistoryRepository.kt
-│   └── UserRepository.kt
 ├── global
 │   ├── config
-│   │   └── JpaConfig.kt
 │   └── exception
-│       ├── BusinessException.kt
-│       ├── ErrorResponse.kt
-│       ├── GlobalExceptionHandler.kt
-│       └── ResponseStatus.kt
+├── infrastructure
 └── presentation
-    ├── CouponController.kt
-    ├── OrderController.kt
-    ├── ProductController.kt
-    ├── UserController.kt
     ├── docs
-    │   ├── CouponApiDocs.kt
-    │   ├── OrderApiDocs.kt
-    │   ├── ProductApiDocs.kt
-    │   └── UserApiDocs.kt
     ├── request
-    │   ├── ChargePointRequest.kt
-    │   ├── CouponIssueRequest.kt
-    │   └── OrderRequest.kt
     └── response
-        ├── IssuedCouponResponse.kt
-        ├── OrderResponse.kt
-        ├── PointChargeResponse.kt
-        ├── PointResponse.kt
-        └── ProductResponse.kt
 ```
 
 <br>
 
 **패키지는 크게 presentation, application, domain, global 로 나뉘어져 있습니다.**
-- **presentation**: API 요청과 응답을 처리하는 컨트롤러와 DTO(Request, Response)를 포함합니다.
+- **presentation**: API 요청과 응답을 처리하는 컨트롤러와 DTO(Request, Response)를 포함합니다. docs 패키지에는 API 문서(swagger)와 관련된 파일이 위치합니다.
 - **application**: 비즈니스 로직은 최대한 도메인에 위치하도록 했고 각 도메인의 상호작용을 조율(orchestration)하는 서비스 클래스가 위치합니다.
-- **domain**: 도메인 모델과 Entity, 레포지토리 인터페이스를 포함합니다. 도메인 모델은 비즈니스 로직을 포함하고 있으며, 엔티티, 레포지토리는 데이터베이스(Persistence/Data Layer)와의 상호작용을 정의합니다. 
+- **domain**: 도메인 모델과 Entity 를 포함합니다. 도메인 모델은 비즈니스 로직을 포함하고 있습니다.
+- **infrastructure**: 레포지토리 인터페이스를 포함합니다. 레포지토리는 데이터베이스(Persistence/Data Layer)와의 상호작용을 정의합니다.
 - **global**: 전역 설정 및 예외 처리를 담당하는 클래스가 위치합니다.
 
 
