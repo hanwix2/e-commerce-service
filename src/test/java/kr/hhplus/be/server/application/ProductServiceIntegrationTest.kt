@@ -1,23 +1,21 @@
 package kr.hhplus.be.server.application
 
 import kr.hhplus.be.server.domain.OrderItem
-import kr.hhplus.be.server.infrastructure.OrderItemRepository
 import kr.hhplus.be.server.domain.Product
-import kr.hhplus.be.server.infrastructure.ProductRepository
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
+import kr.hhplus.be.server.infrastructure.OrderItemRepository
+import kr.hhplus.be.server.infrastructure.ProductRepository
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
 class ProductServiceIntegrationTest @Autowired constructor(
     private val productService: ProductService,
     private val productRepository: ProductRepository,
@@ -33,6 +31,9 @@ class ProductServiceIntegrationTest @Autowired constructor(
 
     @BeforeEach
     fun setUp() {
+        orderItemRepository.deleteAll()
+        productRepository.deleteAll()
+
         product1 = Product(name = "Test Product 1", price = 100L, stock = 10)
         product2 = Product(name = "Test Product 2", price = 200L, stock = 20)
         product3 = Product(name = "Test Product 3", price = 300L, stock = 30)
