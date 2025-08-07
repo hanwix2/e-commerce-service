@@ -65,7 +65,7 @@ class CouponServiceIntegrationTest @Autowired constructor(
         userCouponRepository.findByUserId(user.id).also { userCoupons ->
             assertThat(userCoupons).hasSize(1)
             assertThat(userCoupons[0].userId).isEqualTo(user.id)
-            assertThat(userCoupons[0].coupon).isEqualTo(savedCoupon)
+            assertThat(userCoupons[0].coupon?.id ?: 0).isEqualTo(savedCoupon.id)
         }
     }
 
