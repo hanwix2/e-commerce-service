@@ -6,6 +6,8 @@ import kr.hhplus.be.server.infrastructure.UserRepository
 import kr.hhplus.be.server.infrastructure.findByIdOrThrow
 import kr.hhplus.be.server.presentation.response.PointChargeResponse
 import kr.hhplus.be.server.presentation.response.PointResponse
+import org.springframework.orm.ObjectOptimisticLockingFailureException
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,6 +18,10 @@ class UserService(
 ) {
 
     @Transactional
+    @Retryable(
+        value = [ObjectOptimisticLockingFailureException::class],
+        maxAttempts = 5
+    )
     fun chargePoint(userId: Long, amount: Long): PointChargeResponse {
         val user = userRepository.findByIdOrThrow(userId)
 
