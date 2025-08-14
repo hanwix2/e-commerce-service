@@ -51,6 +51,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.retry:spring-retry")
 
+	implementation("org.redisson:redisson-spring-boot-starter:3.50.0")
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
