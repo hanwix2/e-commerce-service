@@ -8,6 +8,7 @@ import kr.hhplus.be.server.presentation.request.OrderRequest
 import kr.hhplus.be.server.presentation.response.OrderItemResponse
 import kr.hhplus.be.server.presentation.response.OrderResponse
 import org.springframework.orm.ObjectOptimisticLockingFailureException
+import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
@@ -24,12 +25,12 @@ class OrderService(
     private val userPointHistoryRepository: UserPointHistoryRepository
 ) {
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Retryable(
         value = [ObjectOptimisticLockingFailureException::class],
-        maxAttempts = 5
+        maxAttempts = 3,
+        backoff = Backoff(maxDelay = 1000L, random = true)
     )
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
     fun order(request: OrderRequest): OrderResponse {
         val user = userRepository.findByIdOrThrow(request.userId)
 
