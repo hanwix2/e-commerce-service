@@ -53,6 +53,9 @@ dependencies {
 
 	// redis
 	implementation("org.redisson:redisson-spring-boot-starter:3.50.0")
+	implementation("org.springframework.boot:spring-boot-starter-cache")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
 
@@ -70,6 +73,9 @@ dependencies {
 
 	// logger
 	implementation("io.github.oshai:kotlin-logging-jvm:7.0.12")
+
+	// Serialization
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 }
 
 tasks.withType<Test> {
