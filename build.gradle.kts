@@ -51,6 +51,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.retry:spring-retry")
 
+	// redis
 	implementation("org.redisson:redisson-spring-boot-starter:3.50.0")
     // DB
 	runtimeOnly("com.mysql:mysql-connector-j")
@@ -66,6 +67,9 @@ dependencies {
 
 	// Docs
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
+
+	// logger
+	implementation("io.github.oshai:kotlin-logging-jvm:7.0.12")
 }
 
 tasks.withType<Test> {
