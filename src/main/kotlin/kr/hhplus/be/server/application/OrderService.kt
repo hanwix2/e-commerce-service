@@ -10,6 +10,7 @@ import kr.hhplus.be.server.presentation.response.OrderResponse
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
@@ -28,6 +29,7 @@ class OrderService(
         value = [ObjectOptimisticLockingFailureException::class],
         maxAttempts = 5
     )
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     fun order(request: OrderRequest): OrderResponse {
         val user = userRepository.findByIdOrThrow(request.userId)
 

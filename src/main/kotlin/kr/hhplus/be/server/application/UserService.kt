@@ -9,6 +9,7 @@ import kr.hhplus.be.server.presentation.response.PointResponse
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
@@ -17,7 +18,7 @@ class UserService(
     private val userPointHistoryRepository: UserPointHistoryRepository
 ) {
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Retryable(
         value = [ObjectOptimisticLockingFailureException::class],
         maxAttempts = 5

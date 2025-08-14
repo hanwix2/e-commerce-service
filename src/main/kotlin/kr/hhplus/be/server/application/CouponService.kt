@@ -12,6 +12,7 @@ import kr.hhplus.be.server.presentation.response.IssuedCouponResponse
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
@@ -21,7 +22,7 @@ class CouponService(
     private val userRepository: UserRepository
 ) {
 
-    @Transactional
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Retryable(
         value = [ObjectOptimisticLockingFailureException::class],
         maxAttempts = 5
