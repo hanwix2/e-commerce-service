@@ -13,6 +13,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import java.time.LocalDateTime
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -75,14 +76,16 @@ class ProductServiceIntegrationTest @Autowired constructor(
 
     @Test
     fun `getPopularProducts - 인기 상품 상위 5개를 순서대로 조회`() {
+        val now = LocalDateTime.now()
+
         // Given
         orderItemRepository.saveAll(
             listOf(
-                OrderItem(productId = product1.id, quantity = 5),
-                OrderItem(productId = product2.id, quantity = 3),
-                OrderItem(productId = product3.id, quantity = 2),
-                OrderItem(productId = product4.id, quantity = 1),
-                OrderItem(productId = product5.id, quantity = 4)
+                OrderItem(productId = product1.id, quantity = 5, createdAt = now.minusDays(1)),
+                OrderItem(productId = product2.id, quantity = 3, createdAt = now.minusDays(2)),
+                OrderItem(productId = product3.id, quantity = 2, createdAt = now.minusDays(1)),
+                OrderItem(productId = product4.id, quantity = 1, createdAt = now.minusDays(2)),
+                OrderItem(productId = product5.id, quantity = 4, createdAt = now.minusDays(3))
             )
         )
 
