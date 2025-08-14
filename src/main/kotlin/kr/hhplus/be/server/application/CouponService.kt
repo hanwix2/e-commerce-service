@@ -10,6 +10,7 @@ import kr.hhplus.be.server.infrastructure.findByIdOrThrow
 import kr.hhplus.be.server.presentation.request.CouponIssueRequest
 import kr.hhplus.be.server.presentation.response.IssuedCouponResponse
 import org.springframework.orm.ObjectOptimisticLockingFailureException
+import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
@@ -25,7 +26,8 @@ class CouponService(
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Retryable(
         value = [ObjectOptimisticLockingFailureException::class],
-        maxAttempts = 5
+        maxAttempts = 3,
+        backoff = Backoff(maxDelay = 1000L, random = true)
     )
     fun issueCoupon(request: CouponIssueRequest): IssuedCouponResponse {
         val user = userRepository.findByIdOrThrow(request.userId)
