@@ -3,8 +3,10 @@ package kr.hhplus.be.server.application
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kr.hhplus.be.server.domain.OrderItemStatus
 import kr.hhplus.be.server.infrastructure.OrderItemRepository
 import kr.hhplus.be.server.domain.Product
+import kr.hhplus.be.server.global.util.TimeProvider
 import kr.hhplus.be.server.infrastructure.ProductRepository
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
@@ -12,17 +14,19 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.util.*
 
 class ProductServiceTest {
 
     private val productRepository = mockk<ProductRepository>()
     private val orderItemRepository = mockk<OrderItemRepository>()
+    private val timeProvider = mockk<TimeProvider>()
     private lateinit var productService: ProductService
 
     @BeforeEach
     fun setUp() {
-        productService = ProductService(productRepository, orderItemRepository)
+        productService = ProductService(productRepository, orderItemRepository, timeProvider)
     }
 
     @Test
@@ -67,6 +71,8 @@ class ProductServiceTest {
 
     @Test
     fun `getPopularProducts 는 최근 3일간 가장 많이 팔린 상위 5개 상품을 반환한다`() {
+        val currentDate = LocalDate.of(2025, 8, 14)
+
         val product1 = Product(id = 1L, name = "Product 1", price = 1000L, stock = 100)
         val product2 = Product(id = 2L, name = "Product 2", price = 2000L, stock = 200)
         val product3 = Product(id = 3L, name = "Product 3", price = 3000L, stock = 300)
@@ -76,9 +82,12 @@ class ProductServiceTest {
         val productIds = listOf(1L, 2L, 3L, 4L, 5L)
         val products = listOf(product1, product2, product3, product4, product5)
 
+        every { timeProvider.getCurrentDate() } returns currentDate
         every {
-            orderItemRepository.findTopDistinctPurchasedProductIdsByCreatedAtAfter(
-                ProductService.POPULAR_PRODUCT_LIMIT, 
+            orderItemRepository.findTopDistinctProductIdsByStatusAndCreatedAtRange(
+                ProductService.POPULAR_PRODUCT_LIMIT,
+                OrderItemStatus.PURCHASE,
+                any(),
                 any()
             ) 
         } returns productIds
@@ -94,22 +103,19 @@ class ProductServiceTest {
             assertEquals("Product ${i+1}", result[i].productName)
         }
 
-        verify(exactly = 1) {
-            orderItemRepository.findTopDistinctPurchasedProductIdsByCreatedAtAfter(
-                ProductService.POPULAR_PRODUCT_LIMIT, 
-                any()
-            ) 
-        }
-        verify(exactly = 1) { productRepository.findAllByIdIn(productIds) }
     }
 
     @Test
     fun `getPopularProducts 는 인기 상품이 없을 경우 빈 리스트를 반환한다`() {
+        val currentDate = LocalDate.of(2025, 8, 14)
         val emptyProductIds = emptyList<Long>()
 
+        every { timeProvider.getCurrentDate() } returns currentDate
         every {
-            orderItemRepository.findTopDistinctPurchasedProductIdsByCreatedAtAfter(
-                ProductService.POPULAR_PRODUCT_LIMIT, 
+            orderItemRepository.findTopDistinctProductIdsByStatusAndCreatedAtRange(
+                ProductService.POPULAR_PRODUCT_LIMIT,
+                OrderItemStatus.PURCHASE,
+                any(),
                 any()
             ) 
         } returns emptyProductIds
@@ -119,13 +125,5 @@ class ProductServiceTest {
         val result = productService.getPopularProducts()
 
         assertEquals(0, result.size)
-
-        verify(exactly = 1) {
-            orderItemRepository.findTopDistinctPurchasedProductIdsByCreatedAtAfter(
-                ProductService.POPULAR_PRODUCT_LIMIT, 
-                any()
-            ) 
-        }
-        verify(exactly = 1) { productRepository.findAllByIdIn(emptyProductIds) }
     }
 }

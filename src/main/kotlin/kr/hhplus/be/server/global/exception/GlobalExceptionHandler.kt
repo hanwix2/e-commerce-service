@@ -23,6 +23,14 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         return handleExceptionInternal(ResponseStatus.INVALID_PARAMETER, e.message ?: "잘못된 파라미터입니다.")
     }
 
+    @ExceptionHandler(DistributedLockAcquisitionException::class)
+    fun handleDistributedLockAcquisitionException(e: DistributedLockAcquisitionException): ResponseEntity<Any> {
+        return handleExceptionInternal(
+            ResponseStatus.DISTRIBUTED_LOCK_ACQUISITION_FAILED,
+            e.message ?: ResponseStatus.DISTRIBUTED_LOCK_ACQUISITION_FAILED.message
+        )
+    }
+
     override fun handleMethodArgumentNotValid(
         ex: MethodArgumentNotValidException,
         headers: HttpHeaders,
