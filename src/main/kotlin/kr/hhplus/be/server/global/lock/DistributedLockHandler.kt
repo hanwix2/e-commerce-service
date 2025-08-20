@@ -4,11 +4,15 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kr.hhplus.be.server.global.exception.DistributedLockAcquisitionException
 import org.redisson.RedissonMultiLock
 import org.redisson.api.RedissonClient
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
 @Component
 class DistributedLockHandler(
+    @Value("\${spring.data.redis.lock.wait-time}") val defaultWaitTime: Long,
+    @Value("\${spring.data.redis.lock.lease-time}") val defaultLeaseTime: Long,
+
     private val redissonClient: RedissonClient,
 ) {
 
@@ -16,8 +20,8 @@ class DistributedLockHandler(
 
     fun <T> executeWithLock(
         lockKeys: List<String>,
-        waitTime: Long = 10,
-        leaseTime: Long = 5,
+        waitTime: Long = defaultWaitTime,
+        leaseTime: Long = defaultLeaseTime,
         unit: TimeUnit = TimeUnit.SECONDS,
         action: () -> T
     ): T {

@@ -32,3 +32,8 @@ spring:
     init:
       mode: always
       schema-locations: classpath:database/schema.sql
+  data:
+    redis:
+      lock:
+        wait-time: 10
+        lease-time: 5

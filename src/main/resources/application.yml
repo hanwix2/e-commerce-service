@@ -38,3 +38,6 @@ spring:
     redis:
       host: localhost
       port: 6379
+      lock:
+        wait-time: 10
+        lease-time: 5
