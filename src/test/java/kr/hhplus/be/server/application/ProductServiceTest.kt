@@ -3,13 +3,10 @@ package kr.hhplus.be.server.application
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kr.hhplus.be.server.domain.OrderItemStatus
-import kr.hhplus.be.server.infrastructure.OrderItemRepository
 import kr.hhplus.be.server.domain.Product
-import kr.hhplus.be.server.global.util.TimeProvider
-import kr.hhplus.be.server.infrastructure.ProductRepository
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
+import kr.hhplus.be.server.infrastructure.ProductRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
@@ -20,13 +17,12 @@ import java.util.*
 class ProductServiceTest {
 
     private val productRepository = mockk<ProductRepository>()
-    private val orderItemRepository = mockk<OrderItemRepository>()
-    private val timeProvider = mockk<TimeProvider>()
+    private val productOrderRankService = mockk<ProductOrderRankService>()
     private lateinit var productService: ProductService
 
     @BeforeEach
     fun setUp() {
-        productService = ProductService(productRepository, orderItemRepository, timeProvider)
+        productService = ProductService(productRepository, productOrderRankService)
     }
 
     @Test
@@ -82,15 +78,7 @@ class ProductServiceTest {
         val productIds = listOf(1L, 2L, 3L, 4L, 5L)
         val products = listOf(product1, product2, product3, product4, product5)
 
-        every { timeProvider.getCurrentDate() } returns currentDate
-        every {
-            orderItemRepository.findTopDistinctProductIdsByStatusAndCreatedAtRange(
-                ProductService.POPULAR_PRODUCT_LIMIT,
-                OrderItemStatus.PURCHASE,
-                any(),
-                any()
-            ) 
-        } returns productIds
+        every { productOrderRankService.getTopNProductsFromUnion(any()) } returns productIds
 
         every { productRepository.findAllByIdIn(productIds) } returns products
 
@@ -110,15 +98,7 @@ class ProductServiceTest {
         val currentDate = LocalDate.of(2025, 8, 14)
         val emptyProductIds = emptyList<Long>()
 
-        every { timeProvider.getCurrentDate() } returns currentDate
-        every {
-            orderItemRepository.findTopDistinctProductIdsByStatusAndCreatedAtRange(
-                ProductService.POPULAR_PRODUCT_LIMIT,
-                OrderItemStatus.PURCHASE,
-                any(),
-                any()
-            ) 
-        } returns emptyProductIds
+        every { productOrderRankService.getTopNProductsFromUnion(any()) } returns emptyProductIds
 
         every { productRepository.findAllByIdIn(emptyProductIds) } returns emptyList()
 
