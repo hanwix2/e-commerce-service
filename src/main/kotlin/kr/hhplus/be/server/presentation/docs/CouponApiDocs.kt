@@ -90,6 +90,17 @@ interface CouponApiDocs {
                               "message": "쿠폰 발급에 실패했습니다."
                             }
                             """
+                        ),
+                        ExampleObject(
+                            name = "CouponAlreadyIssued",
+                            summary = "이미 발급된 쿠폰",
+                            value = """
+                            {
+                              "code": 4006,
+                              "status": "COUPON_ALREADY_ISSUED",
+                              "message": "이미 발급된 쿠폰입니다."
+                            }
+                            """
                         )
                     ]
                 )]

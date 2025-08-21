@@ -6,6 +6,7 @@ import kotlinx.coroutines.runBlocking
 import kr.hhplus.be.server.domain.Coupon
 import kr.hhplus.be.server.domain.DiscountType
 import kr.hhplus.be.server.domain.User
+import kr.hhplus.be.server.global.cache.KeyName
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
 import kr.hhplus.be.server.infrastructure.CouponRepository
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.test.context.ActiveProfiles
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -29,7 +31,8 @@ class CouponServiceIntegrationTest @Autowired constructor(
     private val couponService: CouponService,
     private val couponRepository: CouponRepository,
     private val userCouponRepository: UserCouponRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val redisTemplate: RedisTemplate<String, String>
 ) {
 
     lateinit var user: User
@@ -47,10 +50,12 @@ class CouponServiceIntegrationTest @Autowired constructor(
             discountAmount = 100L,
             discountType = DiscountType.PRICE,
             issueLimit = 100L,
-            issuedRemain = 10L,
             issuable = true
         )
         val savedCoupon = couponRepository.save(coupon)
+
+        redisTemplate.opsForValue().set(KeyName.COUPON_LEFT + savedCoupon.id, "100")
+
         val request = CouponIssueRequest(userId = user.id, couponId = savedCoupon.id)
 
         // When
@@ -78,12 +83,14 @@ class CouponServiceIntegrationTest @Autowired constructor(
             discountAmount = 100L,
             discountType = DiscountType.PRICE,
             issueLimit = 100L,
-            issuedRemain = 10L,
             issuable = true
         )
-        couponRepository.save(coupon)
+        val savedCoupon = couponRepository.save(coupon)
+
+        redisTemplate.opsForValue().set(KeyName.COUPON_LEFT + savedCoupon.id, "100")
 
         val request = CouponIssueRequest(userId = userId, couponId = coupon.id) // 존재하지 않는 유저 ID
+
 
         // When & Then
         assertThrows<BusinessException> {
@@ -97,6 +104,8 @@ class CouponServiceIntegrationTest @Autowired constructor(
     fun `issueCoupon - 쿠폰이 존재하지 않을 때 쿠폰 발급에 실패한다`() {
         // Given
         val couponId = 0L
+        redisTemplate.opsForValue().set(KeyName.COUPON_LEFT + couponId, "100")
+
         val request = CouponIssueRequest(userId = user.id, couponId = couponId)
 
         // When & Then
@@ -115,10 +124,11 @@ class CouponServiceIntegrationTest @Autowired constructor(
             discountAmount = 100L,
             discountType = DiscountType.PRICE,
             issueLimit = 100L,
-            issuedRemain = 10L,
             issuable = false
         )
-        couponRepository.save(coupon)
+        val savedCoupon = couponRepository.save(coupon)
+
+        redisTemplate.opsForValue().set(KeyName.COUPON_LEFT + savedCoupon.id, "100")
 
         val request = CouponIssueRequest(userId = user.id, couponId = coupon.id)
 
@@ -138,10 +148,12 @@ class CouponServiceIntegrationTest @Autowired constructor(
             discountAmount = 100L,
             discountType = DiscountType.PRICE,
             issueLimit = 100L,
-            issuedRemain = 0L,
             issuable = true
         )
-        couponRepository.save(coupon)
+        val savedCoupon = couponRepository.save(coupon)
+
+        redisTemplate.opsForValue().set(KeyName.COUPON_LEFT + savedCoupon.id, "0")
+
         val request = CouponIssueRequest(userId = user.id, couponId = coupon.id)
 
         // When & Then
@@ -169,11 +181,12 @@ class CouponServiceIntegrationTest @Autowired constructor(
             discountAmount = 100L,
             discountType = DiscountType.PRICE,
             issueLimit = couponIssueLimit,
-            issuedRemain = couponIssueLimit,
             issuable = true
         )
         val savedCoupon = couponRepository.save(coupon)
-        val latch = CountDownLatch(couponIssueLimit.toInt())
+        redisTemplate.opsForValue().set(KeyName.COUPON_LEFT + savedCoupon.id, couponIssueLimit.toString())
+
+        val latch = CountDownLatch(users.size)
 
         // When
         val exceptions = Collections.synchronizedCollection(mutableListOf<Exception>())
@@ -202,10 +215,6 @@ class CouponServiceIntegrationTest @Autowired constructor(
         assertThat(userCoupons).hasSize(couponIssueLimit.toInt())
 
         assertThat(exceptions.size).isEqualTo(users.size - couponIssueLimit.toInt())
-
-        couponRepository.findById(savedCoupon.id).ifPresent {
-            assertThat(it.issuedRemain).isEqualTo(0L)
-        }
     }
 
 }
