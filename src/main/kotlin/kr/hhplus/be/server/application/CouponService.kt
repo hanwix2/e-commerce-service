@@ -15,7 +15,7 @@ class CouponService(
     private val userCouponRepository: UserCouponRepository,
     private val userRepository: UserRepository,
     private val couponIssueCountRepository: CouponLeftRepository,
-    private val couponIssueUserRepository: RedisCouponIssueUserRepository
+    private val couponIssueUserRepository: CouponIssueUserRepository
 ) {
 
     fun issueCoupon(request: CouponIssueRequest): IssuedCouponResponse {
