@@ -18,19 +18,6 @@ class Coupon(
 
     var issueLimit: Long = 0L,
 
-    var issuedRemain: Long = 0L,
-
     var issuable: Boolean = true,
 
-    @Version
-    var version: Long = 1L
-) {
-
-    fun decreaseIssuedRemain() {
-        if (issuedRemain <= 0) {
-            throw IllegalStateException("No remaining coupons to issue.")
-        }
-        issuedRemain--
-    }
-
-}
+)

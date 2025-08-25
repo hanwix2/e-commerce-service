@@ -5,8 +5,6 @@ CREATE TABLE IF NOT EXISTS coupon (
   discount_amount bigint NOT NULL,
   issuable tinyint(1) NOT NULL DEFAULT '1',
   issue_limit bigint NOT NULL,
-  issued_remain bigint NOT NULL,
-  version bigint NOT NULL DEFAULT '0',
   PRIMARY KEY (id)
 );
 

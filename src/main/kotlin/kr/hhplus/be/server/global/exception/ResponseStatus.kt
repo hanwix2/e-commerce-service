@@ -28,6 +28,7 @@ enum class ResponseStatus(
     COUPON_EXPIRED(HttpStatus.BAD_REQUEST, 4003, "쿠폰이 만료되었습니다."),
     COUPON_OUT_OF_STOCK(HttpStatus.UNPROCESSABLE_ENTITY, 4004, "쿠폰이 모두 소진되었습니다."),
     COUPON_ISSUE_FAILED(HttpStatus.CONFLICT, 4005, "쿠폰 발급에 실패했습니다."),
+    COUPON_ALREADY_ISSUED(HttpStatus.CONFLICT, 4006, "이미 발급된 쿠폰입니다."),
 
     // Infra (5xxxx)
     DISTRIBUTED_LOCK_ACQUISITION_FAILED(HttpStatus.CONFLICT, 50001, "분산 락 획득에 실패했습니다.")

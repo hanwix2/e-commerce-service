@@ -22,12 +22,9 @@ data class IssuedCouponResponse(
     val issuedAt: LocalDateTime
 ) {
     companion object {
-        fun from(
-            userId: Long,
-            userCoupon: UserCoupon
-        ): IssuedCouponResponse {
+        fun from(userCoupon: UserCoupon): IssuedCouponResponse {
             return IssuedCouponResponse(
-                userId = userId,
+                userId = userCoupon.userId,
                 userCouponId = userCoupon.id,
                 discountType = userCoupon.discountType.name,
                 discountAmount = userCoupon.discountAmount,

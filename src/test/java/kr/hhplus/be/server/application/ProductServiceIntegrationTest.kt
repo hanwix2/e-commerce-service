@@ -1,11 +1,12 @@
 package kr.hhplus.be.server.application
 
-import kr.hhplus.be.server.domain.OrderItem
 import kr.hhplus.be.server.domain.Product
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
+import kr.hhplus.be.server.global.util.Constant
 import kr.hhplus.be.server.infrastructure.OrderItemRepository
 import kr.hhplus.be.server.infrastructure.ProductRepository
+import kr.hhplus.be.server.infrastructure.RedisProductOrderRankRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,14 +14,16 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import java.time.LocalDateTime
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @SpringBootTest
 @ActiveProfiles("test")
 class ProductServiceIntegrationTest @Autowired constructor(
     private val productService: ProductService,
     private val productRepository: ProductRepository,
-    private val orderItemRepository: OrderItemRepository
+    private val orderItemRepository: OrderItemRepository,
+    private val redisProductOrderRankRepository: RedisProductOrderRankRepository
 ) {
 
     private lateinit var product1: Product
@@ -76,18 +79,25 @@ class ProductServiceIntegrationTest @Autowired constructor(
 
     @Test
     fun `getPopularProducts - 인기 상품 상위 5개를 순서대로 조회`() {
-        val now = LocalDateTime.now()
-
         // Given
-        orderItemRepository.saveAll(
-            listOf(
-                OrderItem(productId = product1.id, quantity = 5, createdAt = now.minusDays(1)),
-                OrderItem(productId = product2.id, quantity = 3, createdAt = now.minusDays(2)),
-                OrderItem(productId = product3.id, quantity = 2, createdAt = now.minusDays(1)),
-                OrderItem(productId = product4.id, quantity = 1, createdAt = now.minusDays(2)),
-                OrderItem(productId = product5.id, quantity = 4, createdAt = now.minusDays(3))
-            )
+        val currentDate = LocalDate.now()
+
+        redisProductOrderRankRepository.addOrderedProduct(
+            currentDate.minusDays(0).format(DateTimeFormatter.BASIC_ISO_DATE), product1.id, 5
         )
+        redisProductOrderRankRepository.addOrderedProduct(
+            currentDate.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE), product2.id, 3
+        )
+        redisProductOrderRankRepository.addOrderedProduct(
+            currentDate.minusDays(2).format(DateTimeFormatter.BASIC_ISO_DATE), product3.id, 2
+        )
+        redisProductOrderRankRepository.addOrderedProduct(
+            currentDate.minusDays(0).format(DateTimeFormatter.BASIC_ISO_DATE), product4.id, 1
+        )
+        redisProductOrderRankRepository.addOrderedProduct(
+            currentDate.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE), product5.id, 4
+        )
+        redisProductOrderRankRepository.saveAggregatedOrderedProductCount(currentDate, Constant.POPULAR_PRODUCT_SCAN_DAY_RANGE)
 
         // When
         val response = productService.getPopularProducts()

@@ -1,47 +1,55 @@
 package kr.hhplus.be.server.application
 
-import kr.hhplus.be.server.domain.*
+import kr.hhplus.be.server.domain.Coupon
+import kr.hhplus.be.server.domain.UserCoupon
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
-import kr.hhplus.be.server.infrastructure.CouponRepository
-import kr.hhplus.be.server.infrastructure.UserCouponRepository
-import kr.hhplus.be.server.infrastructure.UserRepository
-import kr.hhplus.be.server.infrastructure.findByIdOrThrow
+import kr.hhplus.be.server.infrastructure.*
 import kr.hhplus.be.server.presentation.request.CouponIssueRequest
 import kr.hhplus.be.server.presentation.response.IssuedCouponResponse
-import org.springframework.orm.ObjectOptimisticLockingFailureException
-import org.springframework.retry.annotation.Backoff
-import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Isolation
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CouponService(
     private val couponRepository: CouponRepository,
     private val userCouponRepository: UserCouponRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val couponIssueCountRepository: CouponLeftRepository,
+    private val couponIssueUserRepository: CouponIssueUserRepository
 ) {
 
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
-    @Retryable(
-        value = [ObjectOptimisticLockingFailureException::class],
-        maxAttempts = 3,
-        backoff = Backoff(maxDelay = 1000L, random = true)
-    )
     fun issueCoupon(request: CouponIssueRequest): IssuedCouponResponse {
-        val user = userRepository.findByIdOrThrow(request.userId)
 
-        val coupon = getCoupon(request.couponId)
-        val userCoupon = userCouponRepository.save(UserCoupon.create(coupon, user.id))
+        if (couponIssueUserRepository.add(request.couponId, request.userId) == 0L) {
+            throw BusinessException(ResponseStatus.COUPON_ALREADY_ISSUED)
+        }
 
-        coupon.decreaseIssuedRemain()
-        couponRepository.save(coupon)
+        val couponLeft = couponIssueCountRepository.decrement(request.couponId)
 
-        return IssuedCouponResponse.from(
-            userId = user.id,
-            userCoupon = userCoupon
-        )
+        try {
+            val userCoupon = createUserCoupon(request.couponId, request.userId, couponLeft)
+
+            return IssuedCouponResponse.from(userCoupon)
+        } catch (e: BusinessException) {
+            couponIssueUserRepository.delete(request.couponId, request.userId)
+            couponIssueCountRepository.increment(request.couponId)
+            throw BusinessException(e.status)
+        }
+    }
+
+    private fun createUserCoupon(
+        couponId: Long,
+        userId: Long,
+        couponLeft: Long
+    ): UserCoupon {
+        val coupon = getCoupon(couponId)
+
+        if (couponLeft < 0) {
+            throw BusinessException(ResponseStatus.COUPON_OUT_OF_STOCK)
+        }
+
+        val user = userRepository.findByIdOrThrow(userId)
+        return userCouponRepository.save(UserCoupon.create(coupon, user.id))
     }
 
     private fun getCoupon(couponId: Long): Coupon {
@@ -49,9 +57,6 @@ class CouponService(
 
         if (!coupon.issuable)
             throw BusinessException(ResponseStatus.INVALID_COUPON)
-
-        if (coupon.issuedRemain <= 0)
-            throw BusinessException(ResponseStatus.COUPON_OUT_OF_STOCK)
 
         return coupon
     }

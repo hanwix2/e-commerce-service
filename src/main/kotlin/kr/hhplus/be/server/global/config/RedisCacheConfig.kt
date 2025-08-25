@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.global.config
 
 import kr.hhplus.be.server.global.cache.CacheName
+import kr.hhplus.be.server.global.cache.TimeToLive
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
@@ -43,8 +44,8 @@ class RedisCacheConfig(
             .disableCachingNullValues()
 
         val cacheConfigs: Map<String, RedisCacheConfiguration> = mapOf(
-            CacheName.POPULAR_PRODUCTS to RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofDays(1))
+            CacheName.PRODUCTS to RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofDays(TimeToLive.PRODUCTS))
         )
 
         return RedisCacheManager.builder(redisConnectionFactory)
