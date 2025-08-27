@@ -61,7 +61,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     private fun makeErrorResponseBody(e: BindException, status: ResponseStatus): ErrorResponse {
         val errorResponse = ErrorResponse(
-            code = status.code,
             status = status,
             message = status.message,
             errors = e.bindingResult.fieldErrors.map { fieldError ->
@@ -76,7 +75,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     private fun makeErrorResponseBody(status: ResponseStatus): ErrorResponse {
         val errorResponse = ErrorResponse(
-            code = status.code,
             status = status,
             message = status.message
         )
@@ -85,7 +83,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
     private fun makeErrorResponseBody(status: ResponseStatus, message: String): ErrorResponse {
         val errorResponse = ErrorResponse(
-            code = status.code,
             status = status,
             message = message
         )

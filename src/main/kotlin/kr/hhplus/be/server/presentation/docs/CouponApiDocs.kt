@@ -32,7 +32,6 @@ interface CouponApiDocs {
                             summary = "사용자 없음",
                             value = """
                             {
-                              "code": 1001,
                               "status": "USER_NOT_FOUND",
                               "message": "사용자를 찾을 수 없습니다."
                             }
@@ -43,7 +42,6 @@ interface CouponApiDocs {
                             summary = "쿠폰 정보 없음",
                             value = """
                             {
-                              "code": 4001,
                               "status": "COUPON_NOT_FOUND",
                               "message": "쿠폰을 찾을 수 없습니다."
                             }
@@ -63,7 +61,6 @@ interface CouponApiDocs {
                             summary = "쿠폰 발급 불가 상태",
                             value = """
                             {
-                              "code": 4002,
                               "status": "INVALID_COUPON",
                               "message": "쿠폰이 유효하지 않습니다."
                             }
@@ -74,7 +71,6 @@ interface CouponApiDocs {
                             summary = "쿠폰 소진(마감)",
                             value = """
                             {
-                              "code": 4004,
                               "status": "COUPON_OUT_OF_STOCK",
                               "message": "쿠폰이 모두 소진되었습니다."
                             }
@@ -85,7 +81,6 @@ interface CouponApiDocs {
                             summary = "쿠폰 발급 실패(기타 서버 오류/레이스 등)",
                             value = """
                             {
-                              "code": 4005,
                               "status": "COUPON_ISSUE_FAILED",
                               "message": "쿠폰 발급에 실패했습니다."
                             }
@@ -96,7 +91,6 @@ interface CouponApiDocs {
                             summary = "이미 발급된 쿠폰",
                             value = """
                             {
-                              "code": 4006,
                               "status": "COUPON_ALREADY_ISSUED",
                               "message": "이미 발급된 쿠폰입니다."
                             }

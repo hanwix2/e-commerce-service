@@ -43,7 +43,6 @@ interface UserApiDocs {
                                 ExampleObject(
                                     name = "UserNotFound",
                                     value = """{
-                                    "code": 1001,
                                     "status": "USER_NOT_FOUND",
                                     "message": "사용자를 찾을 수 없습니다."
                                 }"""
@@ -86,7 +85,6 @@ interface UserApiDocs {
                         ExampleObject(
                             name = "UserNotFound",
                             value = """{
-                                "code": 1001,
                                 "status": "USER_NOT_FOUND",
                                 "message": "사용자를 찾을 수 없습니다."
                             }"""

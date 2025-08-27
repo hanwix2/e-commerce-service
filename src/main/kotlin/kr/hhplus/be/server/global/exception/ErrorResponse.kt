@@ -5,9 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 @Schema(description = "공통 에러 응답")
 data class ErrorResponse(
-    @Schema(description = "에러 코드", example = "1001")
-    val code: Int,
-
     @Schema(description = "에러 상태", example = "USER_NOT_FOUND")
     val status: ResponseStatus,
 

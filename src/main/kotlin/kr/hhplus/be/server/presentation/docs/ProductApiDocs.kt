@@ -39,7 +39,6 @@ interface ProductApiDocs {
                         ExampleObject(
                             name = "ProductNotFound",
                             value = """{
-                                "code": 2001,
                                 "status": "PRODUCT_NOT_FOUND",
                                 "message": "존재하지 않는 상품입니다."
                             }"""

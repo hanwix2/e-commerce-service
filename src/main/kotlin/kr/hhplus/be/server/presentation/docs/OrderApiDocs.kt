@@ -64,7 +64,6 @@ interface OrderApiDocs {
                             summary = "사용자 없음",
                             value = """
                             {
-                              "code": 1001,
                               "status": "USER_NOT_FOUND",
                               "message": "사용자를 찾을 수 없습니다."
                             }
@@ -75,7 +74,6 @@ interface OrderApiDocs {
                             summary = "상품 정보 없음",
                             value = """
                             {
-                              "code": 2001,
                               "status": "PRODUCT_NOT_FOUND",
                               "message": "존재하지 않는 상품입니다."
                             }
@@ -86,7 +84,6 @@ interface OrderApiDocs {
                             summary = "쿠폰 미존재",
                             value = """
                             {
-                              "code": 4001,
                               "status": "COUPON_NOT_FOUND",
                               "message": "쿠폰을 찾을 수 없습니다."
                             }
@@ -106,7 +103,6 @@ interface OrderApiDocs {
                             summary = "상품 재고 없음",
                             value = """
                             {
-                              "code": 2002,
                               "status": "PRODUCT_OUT_OF_STOCK",
                               "message": "상품의 재고가 부족합니다."
                             }
@@ -117,7 +113,6 @@ interface OrderApiDocs {
                             summary = "쿠폰 사용 불가",
                             value = """
                             {
-                              "code": 4002,
                               "status": "INVALID_COUPON",
                               "message": "쿠폰이 유효하지 않습니다."
                             }
@@ -128,7 +123,6 @@ interface OrderApiDocs {
                             summary = "포인트 부족",
                             value = """
                             {
-                              "code": 1003,
                               "status": "POINT_NOT_ENOUGH",
                               "message": "포인트가 부족합니다."
                             }
@@ -139,7 +133,6 @@ interface OrderApiDocs {
                             summary = "결제 실패",
                             value = """
                             {
-                              "code": 3001,
                               "status": "ORDER_FAILED",
                               "message": "주문이 실패했습니다."
                             }
