@@ -19,8 +19,8 @@ class ProductOrderRankService(
     }
 
     fun addUnionOrderCount(numberOfDays: Long) {
-        val currentDate = timeProvider.getCurrentDate()
-        productOrderRankRepository.saveAggregatedOrderedProductCount(currentDate, numberOfDays)
+        val dateOfYesterday = timeProvider.getCurrentDate().minusDays(1)
+        productOrderRankRepository.saveAggregatedOrderedProductCount(dateOfYesterday, numberOfDays)
     }
 
     @Cacheable(cacheNames = [CacheName.PRODUCTS], key = CacheKey.TOP_N_PRODUCTS)

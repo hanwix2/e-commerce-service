@@ -80,24 +80,24 @@ class ProductServiceIntegrationTest @Autowired constructor(
     @Test
     fun `getPopularProducts - 인기 상품 상위 5개를 순서대로 조회`() {
         // Given
-        val currentDate = LocalDate.now()
+        val dateOfYesterday = LocalDate.now().minusDays(1)
 
         redisProductOrderRankRepository.addOrderedProduct(
-            currentDate.minusDays(0).format(DateTimeFormatter.BASIC_ISO_DATE), product1.id, 5
+            dateOfYesterday.minusDays(0).format(DateTimeFormatter.BASIC_ISO_DATE), product1.id, 5
         )
         redisProductOrderRankRepository.addOrderedProduct(
-            currentDate.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE), product2.id, 3
+            dateOfYesterday.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE), product2.id, 3
         )
         redisProductOrderRankRepository.addOrderedProduct(
-            currentDate.minusDays(2).format(DateTimeFormatter.BASIC_ISO_DATE), product3.id, 2
+            dateOfYesterday.minusDays(2).format(DateTimeFormatter.BASIC_ISO_DATE), product3.id, 2
         )
         redisProductOrderRankRepository.addOrderedProduct(
-            currentDate.minusDays(0).format(DateTimeFormatter.BASIC_ISO_DATE), product4.id, 1
+            dateOfYesterday.minusDays(0).format(DateTimeFormatter.BASIC_ISO_DATE), product4.id, 1
         )
         redisProductOrderRankRepository.addOrderedProduct(
-            currentDate.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE), product5.id, 4
+            dateOfYesterday.minusDays(1).format(DateTimeFormatter.BASIC_ISO_DATE), product5.id, 4
         )
-        redisProductOrderRankRepository.saveAggregatedOrderedProductCount(currentDate, Constant.POPULAR_PRODUCT_SCAN_DAY_RANGE)
+        redisProductOrderRankRepository.saveAggregatedOrderedProductCount(dateOfYesterday, Constant.POPULAR_PRODUCT_SCAN_DAY_RANGE)
 
         // When
         val response = productService.getPopularProducts()
