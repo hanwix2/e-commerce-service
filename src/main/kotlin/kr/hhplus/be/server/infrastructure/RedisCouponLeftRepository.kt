@@ -1,12 +1,12 @@
 package kr.hhplus.be.server.infrastructure
 
 import kr.hhplus.be.server.global.cache.KeyName
-import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Repository
 
 @Repository
 class RedisCouponLeftRepository(
-    private val redisTemplate: RedisTemplate<String, String>,
+    private val redisTemplate: StringRedisTemplate,
 ) : CouponLeftRepository {
 
     override fun increment(couponId: Long): Long {
