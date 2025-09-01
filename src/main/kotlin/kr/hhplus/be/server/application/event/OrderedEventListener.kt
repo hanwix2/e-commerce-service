@@ -1,6 +1,7 @@
 package kr.hhplus.be.server.application.event
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
@@ -10,6 +11,7 @@ class OrderedEventListener {
 
     private val logger = KotlinLogging.logger {}
 
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handleEvent(event: OrderedEvent) {
         logger.info {
