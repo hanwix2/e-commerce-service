@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.application
 
+import kr.hhplus.be.server.application.event.OrderedEvent
 import kr.hhplus.be.server.domain.*
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
@@ -7,6 +8,7 @@ import kr.hhplus.be.server.infrastructure.*
 import kr.hhplus.be.server.presentation.request.OrderRequest
 import kr.hhplus.be.server.presentation.response.OrderItemResponse
 import kr.hhplus.be.server.presentation.response.OrderResponse
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.orm.ObjectOptimisticLockingFailureException
 import org.springframework.retry.annotation.Backoff
 import org.springframework.retry.annotation.Retryable
@@ -22,7 +24,8 @@ class OrderService(
     private val orderItemRepository: OrderItemRepository,
     private val paymentRepository: PaymentRepository,
     private val userCouponRepository: UserCouponRepository,
-    private val userPointHistoryRepository: UserPointHistoryRepository
+    private val userPointHistoryRepository: UserPointHistoryRepository,
+    private val applicationEventPublisher: ApplicationEventPublisher
 ) {
 
     @Transactional(isolation = Isolation.REPEATABLE_READ)
@@ -46,7 +49,11 @@ class OrderService(
 
         usePoint(user, paidAmount)
 
-        return buildOrderResponse(order, user, totalPrice, discountAmount, paidAmount, orderItems)
+        val response = buildOrderResponse(order, user, totalPrice, discountAmount, paidAmount, orderItems)
+
+        applicationEventPublisher.publishEvent(OrderedEvent.from(response))
+
+        return response
     }
 
     private fun createPaymentInfoAndGetAmount(

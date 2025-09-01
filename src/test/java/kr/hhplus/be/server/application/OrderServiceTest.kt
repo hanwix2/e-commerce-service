@@ -3,6 +3,7 @@ package kr.hhplus.be.server.application
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyAll
 import kr.hhplus.be.server.domain.*
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
@@ -23,6 +24,7 @@ class OrderServiceTest {
     private val paymentRepository = mockk<PaymentRepository>()
     private val userCouponRepository = mockk<UserCouponRepository>()
     private val userPointHistoryRepository = mockk<UserPointHistoryRepository>()
+    private val applicationEventPublisher = mockk<org.springframework.context.ApplicationEventPublisher>(relaxed = true)
 
     private lateinit var orderService: OrderService
 
@@ -35,7 +37,8 @@ class OrderServiceTest {
             orderItemRepository,
             paymentRepository,
             userCouponRepository,
-            userPointHistoryRepository
+            userPointHistoryRepository,
+            applicationEventPublisher
         )
     }
 
@@ -108,15 +111,17 @@ class OrderServiceTest {
         assertEquals(totalPrice, result.paidAmount)
         assertEquals(2, result.items.size)
 
-        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
-        verify(exactly = 1) { productRepository.findByIdOrNull(productId1) }
-        verify(exactly = 1) { productRepository.findByIdOrNull(productId2) }
-        verify(exactly = 1) { orderRepository.save(any()) }
-        verify(exactly = 1) { orderItemRepository.saveAll(any<List<OrderItem>>()) }
-        verify(exactly = 1) { paymentRepository.save(any()) }
-        verify(exactly = 1) { userRepository.save(any()) }
-        verify(exactly = 1) { userPointHistoryRepository.save(any()) }
-        verify(exactly = 0) { userCouponRepository.findByIdOrNull(any()) }
+        verifyAll {
+            userRepository.findByIdOrNull(userId)
+            productRepository.findByIdOrNull(productId1)
+            productRepository.findByIdOrNull(productId2)
+            orderRepository.save(any())
+            orderItemRepository.saveAll(any<List<OrderItem>>())
+            paymentRepository.save(any())
+            userRepository.save(any())
+            userPointHistoryRepository.save(any())
+            applicationEventPublisher.publishEvent(any<Any>())
+        }
 
         assertEquals(10 - quantity1, product1.stock)
         assertEquals(5 - quantity2, product2.stock)
