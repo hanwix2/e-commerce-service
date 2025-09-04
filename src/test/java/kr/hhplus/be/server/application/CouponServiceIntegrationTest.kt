@@ -30,7 +30,6 @@ import java.util.concurrent.CountDownLatch
 class CouponServiceIntegrationTest @Autowired constructor(
     private val couponService: CouponService,
     private val couponRepository: CouponRepository,
-    private val userCouponRepository: UserCouponRepository,
     private val userRepository: UserRepository,
     private val redisTemplate: StringRedisTemplate
 ) {
@@ -63,15 +62,7 @@ class CouponServiceIntegrationTest @Autowired constructor(
 
         // Then
         assertThat(response.userId).isEqualTo(user.id)
-        assertThat(response.userCouponId).isNotNull
-        assertThat(response.discountType).isEqualTo(savedCoupon.discountType.name)
-        assertThat(response.discountAmount).isEqualTo(savedCoupon.discountAmount)
-
-        userCouponRepository.findByUserId(user.id).also { userCoupons ->
-            assertThat(userCoupons).hasSize(1)
-            assertThat(userCoupons[0].userId).isEqualTo(user.id)
-            assertThat(userCoupons[0].coupon?.id ?: 0).isEqualTo(savedCoupon.id)
-        }
+        assertThat(response.couponId).isEqualTo(savedCoupon.id)
     }
 
     @Test
@@ -209,11 +200,6 @@ class CouponServiceIntegrationTest @Autowired constructor(
         latch.await()
 
         // Then
-        val userCoupons = users.flatMap { user ->
-            userCouponRepository.findByUserId(user.id)
-        }
-        assertThat(userCoupons).hasSize(couponIssueLimit.toInt())
-
         assertThat(exceptions.size).isEqualTo(users.size - couponIssueLimit.toInt())
     }
 

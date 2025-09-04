@@ -1,8 +1,11 @@
 package kr.hhplus.be.server.application
 
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
+import kr.hhplus.be.server.application.producer.CouponMessageProducer
 import kr.hhplus.be.server.domain.*
 import kr.hhplus.be.server.global.exception.BusinessException
 import kr.hhplus.be.server.global.exception.ResponseStatus
@@ -24,9 +27,10 @@ class CouponServiceTest {
     private val userRepository = mockk<UserRepository>()
     private val couponIssueCountRepository = mockk<CouponLeftRepository>()
     private val couponIssueUserRepository = mockk<RedisCouponIssueUserRepository>()
+    private val couponMessageProducer = mockk<CouponMessageProducer>()
     private val couponService = CouponService(
         couponRepository, userCouponRepository, userRepository,
-        couponIssueCountRepository, couponIssueUserRepository
+        couponIssueCountRepository, couponIssueUserRepository, couponMessageProducer
     )
 
     @Test
@@ -55,20 +59,16 @@ class CouponServiceTest {
         every { couponIssueCountRepository.decrement(couponId) } returns 99L
         every { userRepository.findByIdOrNull(userId) } returns user
         every { couponRepository.findByIdOrNull(couponId) } returns coupon
-        every { userCouponRepository.save(any()) } returns userCoupon
-        every { couponRepository.save(any()) } returns coupon
+        every { couponMessageProducer.sendUserCouponIssueRequest(any()) } just Runs
 
         val result = couponService.issueCoupon(request)
 
         verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
         verify(exactly = 1) { couponRepository.findByIdOrNull(couponId) }
-        verify(exactly = 1) { userCouponRepository.save(any()) }
+        verify(exactly = 1) { couponMessageProducer.sendUserCouponIssueRequest(any()) }
 
         assertEquals(userId, result.userId)
-        assertEquals(userCoupon.id, result.userCouponId)
-        assertEquals(discountType.name, result.discountType)
-        assertEquals(discountAmount, result.discountAmount)
-        assertEquals(userCoupon.createdAt, result.issuedAt)
+        assertEquals(couponId, result.couponId)
     }
 
     @Test
@@ -92,7 +92,7 @@ class CouponServiceTest {
         every { couponIssueUserRepository.delete(any(), any()) } returns 1L
         every { couponIssueCountRepository.increment(couponId) } returns 100L
         every { couponRepository.findByIdOrNull(couponId) } returns coupon
-        every { userRepository.findByIdOrNull(userId) } returns  null
+        every { userRepository.findByIdOrNull(userId) } returns null
 
         val exception = assertThrows(BusinessException::class.java) {
             couponService.issueCoupon(request)
@@ -146,6 +146,7 @@ class CouponServiceTest {
         every { couponIssueCountRepository.decrement(couponId) } returns 99L
         every { couponIssueUserRepository.delete(any(), any()) } returns 1L
         every { couponIssueCountRepository.increment(couponId) } returns 100L
+        every { userRepository.findByIdOrNull(userId) } returns user
         every { couponRepository.findByIdOrNull(couponId) } returns coupon
 
         val exception = assertThrows(BusinessException::class.java) {
@@ -214,6 +215,101 @@ class CouponServiceTest {
         }
 
         assertEquals(ResponseStatus.COUPON_ALREADY_ISSUED, exception.status)
+    }
+
+    @Test
+    fun `createUserCoupon 성공적으로 유저 쿠폰을 생성한다`() {
+        val userId = 1L
+        val couponId = 101L
+        val discountAmount = 5000L
+        val discountType = DiscountType.PRICE
+
+        val user = User(id = userId, name = "Test User")
+        val coupon = Coupon(
+            id = couponId,
+            name = "Test Coupon",
+            discountAmount = discountAmount,
+            discountType = discountType,
+            issueLimit = 100L,
+            issuable = true
+        )
+
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { couponRepository.findByIdOrNull(couponId) } returns coupon
+        every { userCouponRepository.save(any()) } returns UserCoupon.create(coupon, userId)
+
+        couponService.createUserCoupon(userId, couponId)
+
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { couponRepository.findByIdOrNull(couponId) }
+        verify(exactly = 1) { userCouponRepository.save(any()) }
+    }
+
+    @Test
+    fun `createUserCoupon 은 유저가 존재하지 않을 때 실패한다`() {
+        val userId = 1L
+        val couponId = 101L
+
+        every { userRepository.findByIdOrNull(userId) } returns null
+
+        val exception = assertThrows(BusinessException::class.java) {
+            couponService.createUserCoupon(userId, couponId)
+        }
+
+        assertEquals(ResponseStatus.USER_NOT_FOUND, exception.status)
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 0) { couponRepository.findByIdOrNull(any()) }
+        verify(exactly = 0) { userCouponRepository.save(any()) }
+    }
+
+    @Test
+    fun `createUserCoupon 은 쿠폰이 존재하지 않을 때 실패한다`() {
+        val userId = 1L
+        val couponId = 101L
+
+        val user = User(id = userId, name = "Test User")
+
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { couponRepository.findByIdOrNull(couponId) } returns null
+
+        val exception = assertThrows(BusinessException::class.java) {
+            couponService.createUserCoupon(userId, couponId)
+        }
+
+        assertEquals(ResponseStatus.COUPON_NOT_FOUND, exception.status)
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { couponRepository.findByIdOrNull(couponId) }
+        verify(exactly = 0) { userCouponRepository.save(any()) }
+    }
+
+    @Test
+    fun `createUserCoupon 은 발급할 수 없는 쿠폰일 때 실패한다`() {
+        val userId = 1L
+        val couponId = 101L
+        val discountAmount = 5000L
+        val discountType = DiscountType.PRICE
+
+        val user = User(id = userId, name = "Test User")
+        val coupon = Coupon(
+            id = couponId,
+            name = "Test Coupon",
+            discountAmount = discountAmount,
+            discountType = discountType,
+            issueLimit = 100L,
+            issuable = false
+        )
+
+        every { userRepository.findByIdOrNull(userId) } returns user
+        every { couponRepository.findByIdOrNull(couponId) } returns coupon
+
+        val exception = assertThrows(BusinessException::class.java) {
+            couponService.createUserCoupon(userId, couponId)
+        }
+
+        assertEquals(ResponseStatus.INVALID_COUPON, exception.status)
+        verify(exactly = 1) { userRepository.findByIdOrNull(userId) }
+        verify(exactly = 1) { couponRepository.findByIdOrNull(couponId) }
+        verify(exactly = 0) { userCouponRepository.save(any()) }
     }
 
 }

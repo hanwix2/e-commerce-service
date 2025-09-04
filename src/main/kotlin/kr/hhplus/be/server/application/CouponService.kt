@@ -1,5 +1,8 @@
 package kr.hhplus.be.server.application
 
+import jakarta.transaction.Transactional
+import kr.hhplus.be.server.application.event.UserCouponCreateEvent
+import kr.hhplus.be.server.application.producer.CouponMessageProducer
 import kr.hhplus.be.server.domain.Coupon
 import kr.hhplus.be.server.domain.UserCoupon
 import kr.hhplus.be.server.global.exception.BusinessException
@@ -15,7 +18,8 @@ class CouponService(
     private val userCouponRepository: UserCouponRepository,
     private val userRepository: UserRepository,
     private val couponIssueCountRepository: CouponLeftRepository,
-    private val couponIssueUserRepository: CouponIssueUserRepository
+    private val couponIssueUserRepository: CouponIssueUserRepository,
+    private val userCouponCreateProducer: CouponMessageProducer
 ) {
 
     fun issueCoupon(request: CouponIssueRequest): IssuedCouponResponse {
@@ -27,9 +31,13 @@ class CouponService(
         val couponLeft = couponIssueCountRepository.decrement(request.couponId)
 
         try {
-            val userCoupon = createUserCoupon(request.couponId, request.userId, couponLeft)
+            validateCouponLeft(couponLeft)
+            val user = userRepository.findByIdOrThrow(request.userId)
+            val coupon = getCoupon(request.couponId)
 
-            return IssuedCouponResponse.from(userCoupon)
+            userCouponCreateProducer.sendUserCouponIssueRequest(UserCouponCreateEvent(user.id, coupon.id))
+
+            return IssuedCouponResponse(user.id, coupon.id)
         } catch (e: BusinessException) {
             couponIssueUserRepository.delete(request.couponId, request.userId)
             couponIssueCountRepository.increment(request.couponId)
@@ -37,19 +45,21 @@ class CouponService(
         }
     }
 
-    private fun createUserCoupon(
-        couponId: Long,
-        userId: Long,
-        couponLeft: Long
-    ): UserCoupon {
-        val coupon = getCoupon(couponId)
-
+    private fun validateCouponLeft(couponLeft: Long) {
         if (couponLeft < 0) {
             throw BusinessException(ResponseStatus.COUPON_OUT_OF_STOCK)
         }
+    }
 
+    @Transactional
+    fun createUserCoupon(
+        userId: Long,
+        couponId: Long
+    ) {
         val user = userRepository.findByIdOrThrow(userId)
-        return userCouponRepository.save(UserCoupon.create(coupon, user.id))
+        val coupon = getCoupon(couponId)
+
+        userCouponRepository.save(UserCoupon.create(coupon, user.id))
     }
 
     private fun getCoupon(couponId: Long): Coupon {
@@ -60,4 +70,10 @@ class CouponService(
 
         return coupon
     }
+
+    fun restoreCouponIssue(userId: Long, couponId: Long) {
+        couponIssueUserRepository.delete(couponId, userId)
+        couponIssueCountRepository.increment(couponId)
+    }
+
 }
