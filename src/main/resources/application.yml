@@ -41,3 +41,5 @@ spring:
       lock:
         wait-time: 10
         lease-time: 5
+  kafka:
+    bootstrap-servers: localhost:29092
