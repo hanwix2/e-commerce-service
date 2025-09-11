@@ -11,12 +11,14 @@ services:
       - MYSQL_DATABASE=hhplus
     volumes:
       - ./data/mysql/:/var/lib/mysql
+
   redis:
     image: redis:latest
     ports:
       - "6379:6379"
     volumes:
       - ./data/redis/:/data
+
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka
@@ -35,6 +37,7 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       CLUSTER_ID: b0d25d80a7974644801f776c3f2a5f45
       KAFKA_LOG_DIRS: /var/lib/kafka/logs
+
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     ports:
@@ -44,6 +47,25 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
     depends_on:
       - kafka
+
+  influxdb-grafana:
+    image: philhawthorne/docker-influxdb-grafana:latest
+    container_name: docker-influxdb-grafana
+    ports:
+      - "3003:3003"
+      - "3004:8083"
+      - "8086:8086"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=test1234
+    volumes:
+      - influxdb:/var/lib/influxdb
+      - grafana:/var/lib/grafana
+
+volumes:
+  influxdb:
+  grafana:
+
 networks:
   default:
     driver: bridge
