@@ -1,36 +1,10 @@
-## 개요
+## 📍개요
 이커머스 서비스의 대규모 트래픽 상황을 가정하여 시스템 설계, 데이터 처리를 하기 위한 프로젝트.  
 TDD 로 개발을 진행하였습니다.
 
 <br>
 
-## 주요 기능(API)
-| 트래픽이 몰리는 상황에서 동시성 이슈 처리와 안정적인 조회 성능에 집중하기 위해 별도 고객, 상품 관리 그리고 인증 기능은 구현하지 않았습니다.
-
-### 1. 포인트 조회
-- 주문/결제에 필요한 사용자의 보유 포인트 조회 기능
-
-### 2. 포인트 충전
-- 주문/결제에 필요한 사용자의 포인트 충전 기능
-
-### 3. 쿠폰 발급
-- 할인을 받을 수 있는 쿠폰 발급 기능
-- 쿠폰의 수량은 한정되어 있어 선착순으로 발급 받을 수 있습니다. (중복 발급 불가)
-
-### 4. 상품 조회
-- 특정 상품의 정보(재고, 가격 등) 조회 기능
-
-### 5. 인기 상품 조회
-- 최근 3일간 판매량이 높은 상위 5개 상품을 조회하는 기능
-
-### 6. 주문/결제 
-- 사용자가 보유한 포인트와 쿠폰(optional)으로 특정 상품을 주문/결제하는 기능
-- 하나의 API 내에서 주문과 결제 모두 이뤄집니다.
-- 상품 재고를 초과하여 주문이 진행되지 않습니다.
-
-<br>
-
-## Getting Started
+## 📍Getting Started
 
 ### Prerequisites
 
@@ -44,13 +18,54 @@ docker-compose up -d
 
 <br>
 
-## 아키텍처
+## 📍주요 기능(API)
+> 트래픽이 몰리는 상황에서 동시성 이슈 처리와 안정적인 조회 성능에 집중하기 위해 별도 고객, 상품 관리 그리고 인증 기능은 구현하지 않았습니다.
+
+#### 1. 포인트 조회
+- 주문/결제에 필요한 사용자의 보유 포인트 조회 기능
+
+#### 2. 포인트 충전
+- 주문/결제에 필요한 사용자의 포인트 충전 기능
+
+#### 3. 쿠폰 발급
+- 할인을 받을 수 있는 쿠폰 발급 기능
+- 쿠폰의 수량은 한정되어 있어 선착순으로 발급 받을 수 있습니다. (중복 발급 불가)
+
+#### 4. 상품 조회
+- 특정 상품의 정보(재고, 가격 등) 조회 기능
+
+#### 5. 인기 상품 조회
+- 최근 3일간 판매량이 높은 상위 5개 상품을 조회하는 기능
+
+#### 6. 주문/결제 
+- 사용자가 보유한 포인트와 쿠폰(optional)으로 특정 상품을 주문/결제하는 기능
+- 하나의 API 내에서 주문과 결제 모두 이뤄집니다.
+- 상품 재고를 초과하여 주문이 진행되지 않습니다.
+
+<br>
+
+## 📍요구사항 분석
+🔗 Link: [요구사항 분석](docs/requirements.md)
+
+<br>
+
+## 📍기능별 시퀀스 다이어그램
+🔗 Link: [시퀀스 다이어그램](docs/sequence_diagram.md)
+
+<br>
+
+### 📍ERD
+![HH_E_COMMERCE_ERD.jpg](docs/images/HH_E_COMMERCE_ERD_v3.jpg)
+
+<br>
+
+## 📍아키텍처
 
 ### 패키지 구조
 레이어드(Layered) 아키텍처를 기반으로 도메인 중심으로 설계하려고 의도하였습니다.
 
 <details>
-<summary>패키지 구조</summary>
+<summary>(펼치기) 패키지 구조</summary>
 <div markdown="1">
 
 ```aiignore
@@ -92,6 +107,8 @@ docker-compose up -d
 </div>
 </details>
 
+<br>
+
 ### 시스템 아키텍처 다이어그램
 <p align="center">
 <img width="641" height="424" alt="E-Commerce Server Architecture drawio" src="https://github.com/user-attachments/assets/38abac4c-f909-461d-9555-4fd017914776" />
@@ -99,7 +116,7 @@ docker-compose up -d
 
 <br>
 
-## Troubleshooting [[wiki](https://github.com/hanwix2/e-commerce-service/wiki)]
+## 📍Troubleshootings [[wiki](https://github.com/hanwix2/e-commerce-service/wiki)]
 1. [동시성 문제 - DB 를 활용한 해결 방안](https://github.com/hanwix2/e-comerce-service/wiki/%EB%8F%99%EC%8B%9C%EC%84%B1-%EB%AC%B8%EC%A0%9C-%E2%80%90-DB-%EB%A5%BC-%ED%99%9C%EC%9A%A9%ED%95%9C-%ED%95%B4%EA%B2%B0-%EB%B0%A9%EC%95%88)
 1. [성능 저하 예상 쿼리 분석](https://github.com/hanwix2/e-comerce-service/wiki/%EC%84%B1%EB%8A%A5-%EC%A0%80%ED%95%98-%EC%98%88%EC%83%81-%EC%BF%BC%EB%A6%AC-%EB%B6%84%EC%84%9D)
 1. [Redis 캐싱 적용 전 후 비교 분석 보고서](https://github.com/hanwix2/e-commerce-service/wiki/Redis-%EC%BA%90%EC%8B%B1-%EC%A0%81%EC%9A%A9-%EC%A0%84-%ED%9B%84-%EB%B9%84%EA%B5%90-%EB%B6%84%EC%84%9D-%EB%B3%B4%EA%B3%A0%EC%84%9C)
